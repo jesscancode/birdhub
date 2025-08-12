@@ -258,3 +258,15 @@ label {
   padding:8px 12px; border-radius:10px; text-decoration:none;
 }
 .more-info.btn-outline:hover{ background:rgba(8,103,255,.15); }
+
+
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* equal space between badges and chips */
+  margin-top: 6px;
+  align-items: center;
+}
+.status-row .chip.mini {
+  margin: 0; /* removes the default chip margin so it matches badges */
+}

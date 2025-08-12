@@ -94,43 +94,38 @@ function renderSightingCard(rec, sp) {
   const when = formatDateTime(rec.observed_at);
 
   // Card HTML
-  return el(`
-    <div class="card sighting-card">
-      <img class="thumb small" src="${thumb}" alt="">
-      
-      <div class="card-header">
-        <h3 class="common-name">
-          <a href="${rec.url}" target="_blank" rel="noopener">${commonName}</a>
-        </h3>
-        ${confidence ? `<span class="badge confidence">${confidence}</span>` : ''}
-      </div>
-
-      ${scientificName ? `<em class="sci-name">${scientificName}</em>` : ''}
-
-      ${(orderCommon || orderSci) ? `
-        <div class="order-info">${orderCommon ? `${orderCommon} ` : ''}${orderSci ? `<em>(${orderSci})</em>` : ''}</div>
-      ` : ''}
-
-      ${(familyCommon || familySci) ? `
-        <div class="family-info">${familyCommon ? `${familyCommon} ` : ''}${familySci ? `<em>(${familySci})</em>` : ''}</div>
-      ` : ''}
-
-      <div class="status-row">
-        <span class="badge status status-${status.code.toLowerCase()}">${status.label}</span>
-        ${firstEver}
-      </div>
-
-      <div class="small when">${when}</div>
-
-      ${behaviours ? `<div class="behaviours">${behaviours}</div>` : ''}
-
-      <div class="card-footer">
-        ${moreInfo}
-        ${petName}
-      </div>
+return el(`
+  <div class="card sighting-card">
+    <img class="thumb small" src="${thumb}" alt="">
+    
+    <div class="card-header">
+      <h3 class="common-name">
+        <a href="${rec.url}" target="_blank" rel="noopener">${commonName}</a>
+      </h3>
+      ${confidence ? `<span class="badge confidence">${confidence}</span>` : ''}
     </div>
-  `);
-}
+
+    ${scientificName ? `<em class="sci-name">${scientificName}</em>` : ''}
+
+    ${(orderCommon || orderSci) ? `
+      <div class="order-info">${orderCommon ? `${orderCommon} ` : ''}${orderSci ? `<em>(${orderSci})</em>` : ''}</div>
+    ` : ''}
+
+    <div class="status-row">
+      <span class="badge status status-${status.code.toLowerCase()}">${status.label}</span>
+      ${firstEver}
+      ${behaviours ? behaviours : ''}
+    </div>
+
+    <div class="small when">${when}</div>
+
+    <div class="card-footer">
+      ${moreInfo}
+      ${petName}
+    </div>
+  </div>
+`);
+
 
 
 
