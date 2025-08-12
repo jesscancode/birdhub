@@ -30,14 +30,12 @@ window.BirdHub = window.BirdHub || {};
       '### Notes\n',
       '\n_Attach photos/videos below in the GitHub editor._\n'
     ].join('\n');
-    const params = {
-      title: 'Sighting: ',
-      labels: `${CFG.labels.sighting},${CFG.labels.bird}`,
-      body: bodyText
-    };
+    // const params = {
+    //   title: 'Sighting: ',
+    //   labels: `${CFG.labels.sighting},${CFG.labels.bird}`,
+    //   body: bodyText
+    // };
     
-    const logBtn = document.getElementById('logBtn');
-
     // Recent sightings
     try{
       const issues = await g().getIssues();
@@ -53,56 +51,25 @@ window.BirdHub = window.BirdHub || {};
     }
   }
 
-function renderSightingCard(sighting) {
-  // Format date
-  let formattedDate = '';
-  if (sighting.observed_at) {
-    const d = new Date(sighting.observed_at);
-    if (!isNaN(d.getTime())) {
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = d.toLocaleString('en-GB', { month: 'short' });
-      const year = d.getFullYear();
-      const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-      formattedDate = `${day} ${month} ${year} — ${time}`;
-    } else {
-      formattedDate = sighting.observed_at; // fallback if invalid date
-    }
-  }
+function renderSightingCard(rec, sp) {
+  const thumb = rec.images && rec.images[0] ? rec.images[0] : (sp && sp.default_image) || '';
+  const sci = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
+  const img = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
+  const first = rec.first_ever ? '<span class="badge">First ever</span>' : '';
+  const conf  = rec.confidence ? `<span class="badge">${rec.confidence}</span>` : '';
+  const pet   = rec.pet_name ? `<div class="pet-name" style="opacity:.85"><em>${rec.pet_name}</em></div>` : '';
 
-  // Pet Name (optional)
-  const petNameHTML = sighting.pet_name
-    ? `<div class="pet-name" style="font-style: italic; opacity: 0.85;">${sighting.pet_name}</div>`
-    : '';
-
-  return `
-    <div class="card">
-      <h2>${sighting.common_name || 'Unknown bird'}</h2>
-      ${petNameHTML}
-      <div class="sci-name">${sighting.scientific_name || ''}</div>
-      <div class="obs-date">${formattedDate}</div>
-      ${sighting.confidence ? `<span class="badge">${sighting.confidence}</span>` : ''}
-      <div><a href="${sighting.url}" target="_blank">View entry</a></div>
+  return el(`
+    <div class="card sighting-card">
+      ${img}
+      <h3>${rec.common_name || 'Unknown'}</h3>
+      ${pet}
+      ${sci}
+      <div class="small">${formatDateTime(rec.observed_at)}</div>
+      <div style="margin:6px 0">${first} ${conf}</div>
+      <a class="small" href="${rec.url}" target="_blank" rel="noopener">View entry</a>
     </div>
-  `;
-}
-
-// Helper function for date formatting
-function formatDateTime(isoString) {
-  if (!isoString) return '';
-  const date = new Date(isoString);
-  const datePart = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-  return `${datePart} — ${timePart}`;
-}
-
-
-// Helper function for date formatting
-function formatDateTime(isoString) {
-  if (!isoString) return '';
-  const date = new Date(isoString);
-  const datePart = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-  return `${datePart} — ${timePart}`;
+  `);
 }
 
   async function initSightings(){

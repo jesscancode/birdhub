@@ -31,7 +31,12 @@ function parseIssue(issue) {
   const get = (label) => grabBlock(body, label);
 
   const common = get('Common name') || get('Species') || get('Bird');
-  const petName = get('Pet Name'); // 🆕 Capture Pet Name
+  // Accept common variants for the heading
+  const petName =
+    get('Pet Name') ||          // original
+    get('Pet name') ||          // lowercase n (your form)
+    get('Pet') ||               // very short fallback
+    '';                         // default
   const lat = get('Latitude (if Field)') || get('Latitude');
   const lon = get('Longitude (if Field)') || get('Longitude');
 
