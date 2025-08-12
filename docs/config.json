@@ -1,0 +1,15 @@
+{
+  "site_title": "BirdHub",
+  "tagline": "My personal bird log",
+  "repo_owner": "your-username",
+  "repo_name": "birdhub",
+  "labels": {
+    "sighting": "sighting",
+    "bird": "bird"
+  },
+  "home_place_label": "Home garden, Cape Town",
+  "region_code": "ZA-WC",
+  "privacy": {
+    "hide_home_coords": true
+  }
+}

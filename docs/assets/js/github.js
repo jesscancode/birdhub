@@ -1,0 +1,1 @@
+window.BirdHub={initHome(){},initSightings(){},initSpecies(){},initStats(){}};
