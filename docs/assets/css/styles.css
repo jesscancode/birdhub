@@ -54,6 +54,7 @@ header {
 .brand .title {
   font-weight: 700;
   letter-spacing: 0.3px;
+  border: #c3ff01;
 }
 
 nav a {

@@ -1,18 +1,16 @@
-// autocomplete.js
-
-
 <script>
-// --- iNaturalist autocomplete for Common name ---
 (function(){
-  const input = document.getElementById('common_name');
-  const box   = document.getElementById('nameSuggest');
+  const input    = document.getElementById('common_name');
+  const box      = document.getElementById('nameSuggest');
   const hidTaxon = document.getElementById('taxon_id');
   const hidSci   = document.getElementById('scientific_name');
 
-  let items = [];       // current suggestions
-  let active = -1;      // active index for keyboard
-  let lastQ = '';       // last queried string
-  let t;                // debounce timer
+  if (!input || !box) return; // page safety
+
+  let items = [];
+  let active = -1;
+  let lastQ = '';
+  let t;
 
   function debounceFetch(q){
     clearTimeout(t);
@@ -20,21 +18,26 @@
   }
 
   async function fetchSuggestions(q){
-    q = q.trim();
-    if (!q || q === lastQ) { hide(); return; }
+    q = (q||'').trim();
+    if (!q || q === lastQ){ hide(); return; }
     lastQ = q;
 
     try{
-      const url = `https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(q)}&per_page=10`;
+      // Limit to active bird taxa (Aves) and prefer species
+      const url = `https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(q)}&per_page=10&is_active=true&iconic_taxa=Aves`;
       const res = await fetch(url);
-      if (!res.ok) throw new Error('iNat failed');
+      if (!res.ok) throw new Error('iNat API failed');
       const data = await res.json();
-      items = (data.results || []).map(t => ({
-        taxon_id: t.id,
-        common:   t.preferred_common_name || t.name || '',
-        scientific: t.name || '',
-        thumb:    t.default_photo ? t.default_photo.square_url : null
-      }));
+      items = (data.results || [])
+        .map(t => ({
+          taxon_id: t.id,
+          rank: t.rank,
+          common: t.preferred_common_name || t.name || '',
+          scientific: t.name || '',
+          thumb: t.default_photo ? t.default_photo.square_url : null
+        }))
+        // Prefer species-level matches first
+        .sort((a, b) => (a.rank === 'species' ? -1 : 1));
       render();
     }catch(e){
       console.warn('autocomplete error:', e);
@@ -49,7 +52,7 @@
         ${it.thumb?`<img class="thumb" src="${it.thumb}" alt="">`:''}
         <div class="names">
           <div class="common">${escapeHtml(it.common)}</div>
-          <div class="sci"><em>${escapeHtml(it.scientific)}</em></div>
+          <div class="sci"><em>${escapeHtml(it.scientific)}</em> · ${it.rank}</div>
         </div>
       </div>`).join('');
     box.hidden = false;
@@ -59,9 +62,9 @@
 
   function choose(i){
     const it = items[i]; if(!it) return;
-    input.value = it.common;
-    hidTaxon.value = String(it.taxon_id);
-    hidSci.value   = it.scientific;
+    input.value   = it.common || it.scientific;
+    hidTaxon.value = String(it.taxon_id || '');
+    hidSci.value   = it.scientific || '';
     hide();
   }
 
@@ -73,23 +76,27 @@
     if (row) row.scrollIntoView({block:'nearest'});
   }
 
-  // events
+  // Events
   input.addEventListener('input', e=>{
-    // clear stored selection if the user types
+    // Clear stored selection if user types
     hidTaxon.value = ''; hidSci.value = '';
     debounceFetch(e.target.value);
   });
+
   input.addEventListener('keydown', e=>{
     if (box.hidden) return;
     if (e.key === 'ArrowDown'){ e.preventDefault(); move(1); }
     else if (e.key === 'ArrowUp'){ e.preventDefault(); move(-1); }
-    else if (e.key === 'Enter'){ if(active>-1){ e.preventDefault(); choose(active); } }
-    else if (e.key === 'Escape'){ hide(); }
+    else if (e.key === 'Enter'){
+      if (active > -1){ e.preventDefault(); choose(active); }
+    } else if (e.key === 'Escape'){ hide(); }
   });
+
   box.addEventListener('mousedown', e=>{
     const row = e.target.closest('.row'); if(!row) return;
     choose(Number(row.dataset.i));
   });
+
   document.addEventListener('click', e=>{
     if (!box.contains(e.target) && e.target !== input) hide();
   });
