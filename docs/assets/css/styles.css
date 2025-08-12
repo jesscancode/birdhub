@@ -32,11 +32,22 @@ label{display:block;margin:8px 0 6px}
   vertical-align: middle;
 }
 
-.card img {
+/* Target images inside cards in the sightings list */
+#list.grid .card img {
+  display: block;
   width: 100%;
-  height: 200px; /* or whatever fixed height you want */
-  object-fit: cover; /* maintain aspect ratio, crop if necessary */
-  object-position: center; /* centre the image */
-  border-top-left-radius: 0.75rem; /* match your card rounding */
+  height: auto;
+  max-height: 250px; /* prevent overly tall images */
+  object-fit: cover; /* fill while maintaining aspect ratio */
+  object-position: center; /* centre crop */
+  border-top-left-radius: 0.75rem;
   border-top-right-radius: 0.75rem;
+  background-color: #000; /* fallback for transparent images */
+}
+
+/* Optional: slightly larger max-height on small screens */
+@media (max-width: 600px) {
+  #list.grid .card img {
+    max-height: 200px;
+  }
 }
