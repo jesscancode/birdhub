@@ -1,3 +1,4 @@
+<!-- log.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -33,14 +34,19 @@
   <div class="card">
     <h1>Log a sighting</h1>
     <form id="logForm">
-      <label>Common name<input id="common_name" required placeholder="e.g. Cape White-eye" /></label>
-      <div class="form-row">
-        <div><label>Date & time<input id="dt" type="datetime-local"></label></div>
-        <div><label>Count<input id="count" type="number" min="1" value="1"></label></div>
-      </div>
-      <label>Pet name
+<label>Common name
+  <input id="common_name" required placeholder="e.g. Cape White-eye" />
+</label>
+
+<label>Pet name
   <input id="pet_name" placeholder="e.g. Tweety" />
 </label>
+
+<div class="form-row">
+  <div><label>Date & time<input id="dt" type="datetime-local"></label></div>
+  <div><label>Count<input id="count" type="number" min="1" value="1"></label></div>
+</div>
+
       <div class="form-row">
         <div><label>Sex
           <select id="sex">
@@ -141,8 +147,10 @@
     e.preventDefault();
     const $ = id => document.getElementById(id).value.trim();
     const behaviour = [...document.querySelectorAll('.chip.active')].map(x=>x.textContent).join(', ');
+
     const body = [
       '### Common name','', ` ${$('common_name')}`,
+      '','### Pet name','', ` ${$('pet_name')}`,
       '','### Date & time','', ` ${$('dt')}`,
       '','### Count','', ` ${$('count')||'1'}`,
       '','### Sex','', ` ${$('sex')}`,
@@ -163,7 +171,7 @@
 
     const cfg = await (await fetch('./config.json')).json();
     const params = new URLSearchParams({
-      title: 'Sighting: ',
+      title: `Sighting: ${$('common_name')}`,
       labels: `${cfg.labels.sighting},${cfg.labels.bird}`,
       body
     });

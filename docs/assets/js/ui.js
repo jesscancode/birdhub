@@ -35,9 +35,8 @@ window.BirdHub = window.BirdHub || {};
       labels: `${CFG.labels.sighting},${CFG.labels.bird}`,
       body: bodyText
     };
-    const url = g().buildNewIssueUrl(params);
+    
     const logBtn = document.getElementById('logBtn');
-    if (logBtn) logBtn.href = url;
 
     // Recent sightings
     try{
