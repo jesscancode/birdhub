@@ -219,3 +219,33 @@ label {
 }
 .suggestions .common{ font-weight:600 }
 .suggestions .sci{ opacity:.75; font-style:italic; font-size:.92em }
+
+
+/* Sightings card header/footer layout */
+.sighting-card .card-header{
+  display:flex; align-items:center; gap:12px; margin-top:8px;
+}
+.sighting-card .common-name{
+  margin:0; font-size:1.25rem; line-height:1.2;
+}
+.sighting-card .badge.confidence{
+  margin-left:auto;
+}
+
+/* Footer: link left, pet badge right */
+.sighting-card .card-footer{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-top:10px;
+}
+
+/* “View GitHub Entry” link style to match your outline buttons */
+.sighting-card .btn-outline{
+  display:inline-block; padding:8px 12px; border-radius:10px;
+  border:1px solid var(--accent); color:var(--accent); text-decoration:none;
+}
+
+/* Pet name chip */
+.badge.pet-name{
+  background:#c3ff01; color:#0a1a2a; border:1px solid #8fb800;
+  font-weight:700;
+}
