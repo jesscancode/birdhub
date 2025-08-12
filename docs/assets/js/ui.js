@@ -52,24 +52,27 @@ window.BirdHub = window.BirdHub || {};
       console.warn(e);
     }
   }
-
-  function renderSightingCard(rec, sp){
-    const thumb = rec.images[0] || (sp && sp.default_image) || '';
-    const sci = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
-    const img = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
-    const first = rec.first_ever ? '<span class="badge">First ever</span>' : '';
-    const conf = rec.confidence ? `<span class="badge">${rec.confidence}</span>` : '';
-    return el(`
-      <div class="card sighting-card">
-        ${img}
-        <h3>${rec.common_name || 'Unknown'}</h3>
-        ${sci}
-        <div class="small">${rec.observed_at || ''}</div>
-        <div style="margin:6px 0">${first} ${conf}</div>
-        <a class="small" href="${rec.url}" target="_blank">View entry</a>
-      </div>
-    `);
-  }
+  
+function renderSightingCard(rec, sp){
+  const thumb = rec.images[0] || (sp && sp.default_image) || '';
+  const sci = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
+  const img = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
+  const first = rec.first_ever ? '<span class="badge">First ever</span>' : '';
+  const conf = rec.confidence ? `<span class="badge">${rec.confidence}</span>` : '';
+  const petName = rec.pet_name ? `<div class="pet-name">Pet Name: ${rec.pet_name}</div>` : '';
+  
+  return el(`
+    <div class="card sighting-card">
+      ${img}
+      <h3>${rec.common_name || 'Unknown'}</h3>
+      ${petName}
+      ${sci}
+      <div class="small">${formatDateTime(rec.observed_at)}</div>
+      <div style="margin:6px 0">${first} ${conf}</div>
+      <a class="small" href="${rec.url}" target="_blank">View entry</a>
+    </div>
+  `);
+}
 
   async function initSightings(){
     try{
@@ -133,3 +136,26 @@ window.BirdHub = window.BirdHub || {};
   window.BirdHub.initSpecies = initSpecies;
   window.BirdHub.initStats = initStats;
 })();
+
+// Helper function to format datetime
+function formatDateTime(isoString) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const datePart = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${datePart} — ${timePart}`;
+}
+
+// Example rendering function
+function renderCard(item) {
+  return `
+    <div class="card">
+      <h2>${item.common_name}</h2>
+      ${item.pet_name ? `<div class="pet-name">Pet Name: ${item.pet_name}</div>` : ``}
+      <div class="species"><em>${item.scientific_name}</em></div>
+      <div class="datetime">${formatDateTime(item.observed_at)}</div>
+      ${item.confidence ? `<span class="tag">${item.confidence}</span>` : ``}
+      <a href="${item.url}">View entry</a>
+    </div>
+  `;
+}
