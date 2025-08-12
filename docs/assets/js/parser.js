@@ -31,6 +31,7 @@ window.BirdHub = window.BirdHub || {};
     const get = (label) => grabBlock(body, label);
 
     const common = get('Common name') || get('Species') || get('Bird');
+    const petName = get('Pet Name') || ''; // ← NEW: Pet Name support
     const lat = get('Latitude (if Field)') || get('Latitude');
     const lon = get('Longitude (if Field)') || get('Longitude');
 
@@ -45,6 +46,7 @@ window.BirdHub = window.BirdHub || {};
       url: issue.html_url,
       title: issue.title,
       common_name: common,
+      pet_name: petName, // ← NEW: returned as part of record
       observed_at: get('Date & time') || get('Date/Time') || get('Observed at'),
       count: get('Count'),
       sex: get('Sex'),

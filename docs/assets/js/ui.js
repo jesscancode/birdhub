@@ -12,6 +12,7 @@ window.BirdHub = window.BirdHub || {};
     // Prefill body blocks matching the Issue template
     const bodyText = [
       '### Common name\n',
+      '### Pet Name\n',
       '### Date & time\n',
       '### Count\n',
       '### Sex\n',
@@ -52,15 +53,15 @@ window.BirdHub = window.BirdHub || {};
       console.warn(e);
     }
   }
-  
-function renderSightingCard(rec, sp){
+
+function renderSightingCard(rec, sp) {
   const thumb = rec.images[0] || (sp && sp.default_image) || '';
   const sci = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
   const img = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
   const first = rec.first_ever ? '<span class="badge">First ever</span>' : '';
   const conf = rec.confidence ? `<span class="badge">${rec.confidence}</span>` : '';
   const petName = rec.pet_name ? `<div class="pet-name">Pet Name: ${rec.pet_name}</div>` : '';
-  
+
   return el(`
     <div class="card sighting-card">
       ${img}
@@ -72,6 +73,25 @@ function renderSightingCard(rec, sp){
       <a class="small" href="${rec.url}" target="_blank">View entry</a>
     </div>
   `);
+}
+
+// Helper function for date formatting
+function formatDateTime(isoString) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const datePart = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${datePart} — ${timePart}`;
+}
+
+
+// Helper function for date formatting
+function formatDateTime(isoString) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const datePart = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${datePart} — ${timePart}`;
 }
 
   async function initSightings(){
@@ -144,18 +164,4 @@ function formatDateTime(isoString) {
   const datePart = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const timePart = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
   return `${datePart} — ${timePart}`;
-}
-
-// Example rendering function
-function renderCard(item) {
-  return `
-    <div class="card">
-      <h2>${item.common_name}</h2>
-      ${item.pet_name ? `<div class="pet-name">Pet Name: ${item.pet_name}</div>` : ``}
-      <div class="species"><em>${item.scientific_name}</em></div>
-      <div class="datetime">${formatDateTime(item.observed_at)}</div>
-      ${item.confidence ? `<span class="tag">${item.confidence}</span>` : ``}
-      <a href="${item.url}">View entry</a>
-    </div>
-  `;
 }
