@@ -31,3 +31,12 @@ label{display:block;margin:8px 0 6px}
   display: inline-block;
   vertical-align: middle;
 }
+
+.card img {
+  width: 100%;
+  height: 200px; /* or whatever fixed height you want */
+  object-fit: cover; /* maintain aspect ratio, crop if necessary */
+  object-position: center; /* centre the image */
+  border-top-left-radius: 0.75rem; /* match your card rounding */
+  border-top-right-radius: 0.75rem;
+}
