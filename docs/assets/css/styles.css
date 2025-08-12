@@ -21,7 +21,7 @@ label{display:block;margin:8px 0 6px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:700px){.form-row{grid-template-columns:1fr}}
 .sighting-card h3{margin:6px 0 8px}
-.thumb{width:100%;aspect-ratio:16/9;background:#0a2033;border:1px solid #153956;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#557a98}
+.thumb{width:100%;aspect-ratio:16/9;background:#0867ff;border:1px solid #153956;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#557a98}
 
 
 
