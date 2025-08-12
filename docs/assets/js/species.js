@@ -1,19 +1,23 @@
-
+// species.js
 window.BirdHub = window.BirdHub || {};
 (function(){
   const cacheKey = (name) => `bh_taxon_${name.toLowerCase()}`;
 
   async function enrichSpecies(commonName) {
+  try {
     if (!commonName) return null;
     const key = cacheKey(commonName);
     const cached = localStorage.getItem(key);
-    if (cached) { try { return JSON.parse(cached); } catch {} }
+    if (cached) { try { return JSON.parse(cached); } catch (_) {} }
+
     const url = `https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(commonName)}&per_page=1`;
     const res = await fetch(url);
     if (!res.ok) return null;
+
     const data = await res.json();
     const t = data.results && data.results[0];
     if (!t) return null;
+
     const info = {
       scientific_name: t.name,
       preferred_common_name: t.preferred_common_name || commonName,
@@ -24,7 +28,12 @@ window.BirdHub = window.BirdHub || {};
     };
     localStorage.setItem(key, JSON.stringify(info));
     return info;
+  } catch (e) {
+    console.warn('enrichSpecies failed:', e);
+    return null; // never throw
   }
+}
+
 
   async function selectSexImage(taxonId, sex) {
     return { selected: null, male: null, female: null, default: null };

@@ -1,4 +1,4 @@
-
+// ui.js
 window.BirdHub = window.BirdHub || {};
 (function(){
   const g = () => window.BirdHub.github;
@@ -40,10 +40,11 @@ window.BirdHub = window.BirdHub || {};
     try{
       const issues = await g().getIssues();
       const recent = document.getElementById('recent');
-      const top = issues.slice(0,6);
-      for (const it of top){
+      const top = issues.slice(0, 6);
+      for (const it of top) {
         const rec = p().parseIssue(it);
-        const sp = await s().enrichSpecies(rec.common_name);
+        let sp = null;
+        try { sp = await s().enrichSpecies(rec.common_name); } catch (_) { sp = null; }
         recent.appendChild(renderSightingCard(rec, sp));
       }
     } catch(e){
@@ -76,9 +77,10 @@ function renderSightingCard(rec, sp) {
     try{
       const issues = await g().getIssues();
       const list = document.getElementById('list');
-      for (const it of issues){
+      for (const it of issues) {
         const rec = p().parseIssue(it);
-        const sp = await s().enrichSpecies(rec.common_name);
+        let sp = null;
+        try { sp = await s().enrichSpecies(rec.common_name); } catch (_) { sp = null; }
         list.appendChild(renderSightingCard(rec, sp));
       }
     }catch(e){ console.warn(e); }
