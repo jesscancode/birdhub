@@ -20,8 +20,13 @@
     <div class="card">
       <h1>Log a sighting</h1>
       <form id="logForm">
-        <label>Common name
-          <input id="common_name" required placeholder="e.g. Cape Spurfowl" />
+        <label style="position:relative">Common name
+          <input id="common_name" required placeholder="e.g. Cape White-eye" autocomplete="off" />
+          <!-- suggestions dropdown -->
+          <div id="nameSuggest" class="suggestions" hidden></div>
+          <!-- store selection extras if a suggestion is chosen -->
+          <input type="hidden" id="taxon_id" />
+          <input type="hidden" id="scientific_name" />
         </label>
 
         <label>Pet name
@@ -108,6 +113,7 @@
   <div id="site-footer"></div>
 
   <script src="./assets/js/github.js"></script>
+  <script src="./assets/js/autocomplete.js"></script>
   <script>
   (function(){
     const chips = document.getElementById('behChips');

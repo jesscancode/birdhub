@@ -195,3 +195,26 @@ label {
     max-height: 200px;
   }
 }
+
+
+.suggestions{
+  position:absolute; left:0; right:0; top:100%; z-index:20;
+  background:#0e2636; border:1px solid #224861; border-radius:10px;
+  margin-top:6px; max-height:260px; overflow:auto;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.suggestions .row{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px; cursor:pointer;
+}
+.suggestions .row:hover, .suggestions .row.active{
+  background:#0867ff;
+}
+.suggestions .thumb{
+  width:28px; height:28px; border-radius:6px; object-fit:cover; flex:0 0 28px;
+}
+.suggestions .names{
+  display:flex; flex-direction:column; line-height:1.1;
+}
+.suggestions .common{ font-weight:600 }
+.suggestions .sci{ opacity:.75; font-style:italic; font-size:.92em }
