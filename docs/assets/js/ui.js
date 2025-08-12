@@ -52,7 +52,6 @@ window.BirdHub = window.BirdHub || {};
     }
   }
 
-// inside assets/js/ui.js
 function renderSightingCard(rec, sp) {
   const thumb = rec.images && rec.images[0] ? rec.images[0] : (sp && sp.default_image) || '';
   const sci   = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
@@ -78,6 +77,7 @@ function renderSightingCard(rec, sp) {
     </div>
   `);
 }
+
 
   async function initSightings(){
     try{
