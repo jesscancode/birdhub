@@ -54,25 +54,28 @@ window.BirdHub = window.BirdHub || {};
 
 
 async function initHome(){
-  await g().loadConfig(); // ensure config is loaded for GitHub calls
-
-  try{
-    const issues = await g().getIssues();
+  try {
+    await g().loadConfig();                 // ensure repo config is ready
+    const issues = await g().getIssues();   // may throw on network/rate-limit
     const recent = document.getElementById('recent');
-    const top = issues.slice(0, 6);
+    if (!recent) return;
 
+    const top = (issues || []).slice(0, 6);
     for (const it of top){
       const rec = p().parseIssue(it);
 
-      // 👇 don't let a single iNat failure kill the whole loop
+      // iNat enrichment must never block rendering
       let sp = null;
       try { sp = await s().enrichSpecies(rec.common_name); }
-      catch (e) { console.warn('enrichSpecies failed (home):', e); }
+      catch (e) { console.warn('enrichSpecies (home) failed:', e); }
 
       recent.appendChild(renderSightingCard(rec, sp));
     }
-  }catch(e){
+  } catch (e){
     console.warn('initHome failed:', e);
+    // optional: show a friendly empty state
+    const recent = document.getElementById('recent');
+    if (recent) recent.innerHTML = `<div class="small">No recent sightings available.</div>`;
   }
 }
 
@@ -167,25 +170,27 @@ return el(`
   //   }catch(e){ console.warn(e); }
   // }
 
-  async function initSightings(){
-  try{
+async function initSightings(){
+  try {
+    await g().loadConfig();
     const issues = await g().getIssues();
     const list = document.getElementById('list');
+    if (!list) return;
 
-    for (const it of issues){
+    for (const it of (issues || [])){
       const rec = p().parseIssue(it);
-
-      // 👇 same per-item guard here
       let sp = null;
       try { sp = await s().enrichSpecies(rec.common_name); }
-      catch (e) { console.warn('enrichSpecies failed (sightings):', e); }
-
+      catch (e) { console.warn('enrichSpecies (sightings) failed:', e); }
       list.appendChild(renderSightingCard(rec, sp));
     }
-  }catch(e){
+  } catch (e){
     console.warn('initSightings failed:', e);
+    const list = document.getElementById('list');
+    if (list) list.innerHTML = `<div class="small">No sightings to show.</div>`;
   }
 }
+
 
   async function initSpecies(){
     try{
@@ -207,30 +212,54 @@ return el(`
     }catch(e){ console.warn(e); }
   }
 
-  async function initStats(){
-    try{
-      const issues = await g().getIssues();
-      const parsed = issues.map(it => p().parseIssue(it));
-      const set = new Set(parsed.map(r => (r.common_name || '').toLowerCase()).filter(Boolean));
-      document.getElementById('statLifeList').textContent = `${set.size} species`;
-      const now = new Date(); const ym = now.toISOString().slice(0,7);
-      const monthCount = parsed.filter(r => (r.observed_at||'').slice(0,7) === ym).length;
-      document.getElementById('statMonth').textContent = `${monthCount} sightings`;
-      const byDay = new Map();
-      parsed.forEach(r=>{
-        const d = (r.observed_at||'').slice(0,10);
-        const key = `${d}|${(r.common_name||'').toLowerCase()}`;
-        byDay.set(key, true);
-      });
-      const dayCounts = {};
-      for (const k of byDay.keys()){
-        const d = k.split('|')[0];
-        dayCounts[d] = (dayCounts[d]||0)+1;
-      }
-      const big = Object.entries(dayCounts).sort((a,b)=>b[1]-a[1])[0];
-      document.getElementById('statBigDay').textContent = big ? `${big[0]} · ${big[1]} species` : '—';
-    }catch(e){ console.warn(e); }
+async function initStats(){
+  try {
+    await g().loadConfig();
+    const issues = await g().getIssues();
+    const parsed = (issues || []).map(it => p().parseIssue(it));
+
+    // Life list
+    const life = new Set(
+      parsed.map(r => (r.common_name || '').toLowerCase()).filter(Boolean)
+    );
+    const lifeEl = document.getElementById('statLifeList');
+    if (lifeEl) lifeEl.textContent = `${life.size} species`;
+
+    // This month
+    const now = new Date();
+    const ym = now.toISOString().slice(0, 7);
+    const monthCount = parsed.filter(r => (r.observed_at || '').slice(0, 7) === ym).length;
+    const monthEl = document.getElementById('statMonth');
+    if (monthEl) monthEl.textContent = `${monthCount} sighting${monthCount === 1 ? '' : 's'}`;
+
+    // Big day
+    const byDayUniqueSpecies = new Map(); // key: "YYYY-MM-DD|species"
+    parsed.forEach(r => {
+      const d = (r.observed_at || '').slice(0,10);
+      const sp = (r.common_name || '').toLowerCase();
+      if (d && sp) byDayUniqueSpecies.set(`${d}|${sp}`, true);
+    });
+
+    const dayCounts = {};
+    for (const k of byDayUniqueSpecies.keys()){
+      const d = k.split('|')[0];
+      dayCounts[d] = (dayCounts[d] || 0) + 1;
+    }
+    const big = Object.entries(dayCounts).sort((a,b)=>b[1]-a[1])[0];
+    const bigEl = document.getElementById('statBigDay');
+    if (bigEl) bigEl.textContent = big ? `${big[0]} · ${big[1]} species` : '—';
+  } catch (e){
+    console.warn('initStats failed:', e);
+    // show safe placeholders so the UI never looks broken
+    const lifeEl  = document.getElementById('statLifeList');
+    const monthEl = document.getElementById('statMonth');
+    const bigEl   = document.getElementById('statBigDay');
+    if (lifeEl)  lifeEl.textContent  = '—';
+    if (monthEl) monthEl.textContent = '—';
+    if (bigEl)   bigEl.textContent   = '—';
   }
+}
+
 
   window.BirdHub.initHome = initHome;
   window.BirdHub.initSightings = initSightings;
