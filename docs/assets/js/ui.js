@@ -56,7 +56,7 @@ function renderSightingCard(rec, sp) {
   const thumb = rec.images && rec.images[0] ? rec.images[0] : (sp && sp.default_image) || '';
   const sci   = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
   const orderLine = (sp && sp.order && (sp.order.common || sp.order.scientific))
-    ? `<div class="small">Order: ${sp.order.common ? `${sp.order.common} ` : ''}${sp.order.scientific ? `<em>(${sp.order.scientific})</em>` : ''}</div>`
+    ? `<div class="small">${sp.order.common ? `${sp.order.common} ` : ''}${sp.order.scientific ? `<em>(${sp.order.scientific})</em>` : ''}</div>`
     : '';
 
   const img   = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
