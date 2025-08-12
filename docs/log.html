@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BirdHub · Log a sighting</title>
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+  <style>
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{padding:6px 10px;border:1px solid #224861;border-radius:999px;cursor:pointer}
+    .chip.active{background:#0867ff22;border-color:#0867ff}
+    fieldset{border:1px solid #153956;border-radius:12px;padding:12px}
+    legend{padding:0 6px;color:#b8c5d0}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="./assets/images/logo.png" alt="BirdHub logo" class="logo-img" />
+    <span class="title">BirdHub</span>
+  </div>
+  <nav>
+    <a href="./index.html">Home</a>
+    <a href="./sightings.html">Sightings</a>
+    <a href="./species.html">Species</a>
+    <a href="./stats.html">Stats</a>
+    <a href="./privacy.html">Privacy</a>
+  </nav>
+</header>
+
+<main class="container">
+  <div class="card">
+    <h1>Log a sighting</h1>
+    <form id="logForm">
+      <label>Common name<input id="common_name" required placeholder="e.g. Cape White-eye" /></label>
+      <div class="form-row">
+        <div><label>Date & time<input id="dt" type="datetime-local"></label></div>
+        <div><label>Count<input id="count" type="number" min="1" value="1"></label></div>
+      </div>
+      <div class="form-row">
+        <div><label>Sex
+          <select id="sex">
+            <option value="unknown">unknown</option><option>male</option><option>female</option>
+          </select></label></div>
+        <div><label>Age
+          <select id="age">
+            <option>adult</option><option>juvenile</option><option>immature</option><option value="unknown" selected>unknown</option>
+          </select></label></div>
+      </div>
+
+      <label>Behaviour</label>
+      <div id="behChips" class="chips">
+        <span class="chip">feeding</span><span class="chip">singing</span><span class="chip">flying</span>
+        <span class="chip">perched</span><span class="chip">nesting</span><span class="chip">preening</span>
+        <span class="chip">foraging</span><span class="chip">mixed flock</span><span class="chip">other</span>
+      </div>
+
+      <div class="form-row">
+        <div><label>Habitat
+          <select id="habitat">
+            <option>fynbos</option><option>forest</option><option>wetland</option><option>coastal</option>
+            <option>urban</option><option>grassland</option><option>shrubland</option><option>agricultural</option><option>other</option>
+          </select></label></div>
+        <div><label>Call type
+          <select id="calltype">
+            <option>song</option><option>alarm</option><option>contact</option><option>display</option><option>silent</option><option>other</option>
+          </select></label></div>
+      </div>
+
+      <div class="form-row">
+        <div><label>Confidence
+          <select id="confidence">
+            <option>certain</option><option>probable</option><option>possible</option>
+          </select></label></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:28px">
+          <input id="first" type="checkbox"><label for="first">First time ever seen</label>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend>Location</legend>
+        <div class="form-row">
+          <div>
+            <label>Mode
+              <select id="locmode">
+                <option>Home</option><option>Field</option>
+              </select>
+            </label>
+          </div>
+          <div id="homeBlock"><label>Place label<input id="placelabel" placeholder="Home garden, Cape Town"></label></div>
+        </div>
+        <div id="fieldBlock" class="form-row" style="display:none">
+          <div><label>Latitude<input id="lat" placeholder="-33.9"></label></div>
+          <div><label>Longitude<input id="lon" placeholder="18.4"></label></div>
+          <div><label>Precision
+            <select id="precision">
+              <option>exact</option><option>~100m</option><option>~1km</option>
+            </select></label></div>
+        </div>
+      </fieldset>
+
+      <label>Notes<textarea id="notes" rows="4" placeholder="Field notes…"></textarea></label>
+
+      <div style="margin-top:12px;display:flex;gap:10px">
+        <button class="btn" type="submit">Continue on GitHub to attach photos</button>
+        <a class="btn outline" href="./index.html">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<footer><div>BirdHub · Built on GitHub Pages</div></footer>
+
+<script src="./assets/js/github.js"></script>
+<script>
+(function(){
+  const chips = document.getElementById('behChips');
+  chips.addEventListener('click', e => {
+    const c = e.target.closest('.chip'); if(!c) return;
+    c.classList.toggle('active');
+  });
+  const modeSel = document.getElementById('locmode');
+  const home = document.getElementById('homeBlock');
+  const field = document.getElementById('fieldBlock');
+  modeSel.addEventListener('change', ()=> {
+    const isField = modeSel.value === 'Field';
+    field.style.display = isField ? '' : 'none';
+    home.style.display  = isField ? 'none' : '';
+  });
+
+  // Prefill defaults
+  fetch('./config.json').then(r=>r.json()).then(cfg=>{
+    document.getElementById('placelabel').value = cfg.home_place_label || '';
+  });
+
+  document.getElementById('logForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const $ = id => document.getElementById(id).value.trim();
+    const behaviour = [...document.querySelectorAll('.chip.active')].map(x=>x.textContent).join(', ');
+    const body = [
+      '### Common name','', ` ${$('common_name')}`,
+      '','### Date & time','', ` ${$('dt')}`,
+      '','### Count','', ` ${$('count')||'1'}`,
+      '','### Sex','', ` ${$('sex')}`,
+      '','### Age','', ` ${$('age')}`,
+      '','### Behaviour','', ` ${behaviour}`,
+      '','### Habitat','', ` ${$('habitat')}`,
+      '','### Call type','', ` ${$('calltype')}`,
+      '','### Confidence','', ` ${$('confidence')}`,
+      '','### First time ever seen?','', ` ${document.getElementById('first').checked ? 'yes' : 'no'}`,
+      '','### Location mode (Home or Field)','', ` ${$('locmode')}`,
+      '','### Place label (if Home)','', ` ${$('placelabel')}`,
+      '','### Latitude (if Field)','', ` ${$('lat')}`,
+      '','### Longitude (if Field)','', ` ${$('lon')}`,
+      '','### Precision (exact/~100m/~1km)','', ` ${$('precision')}`,
+      '','### Notes','', ` ${$('notes')}`,
+      '','_Attach photos/videos below in the GitHub editor._'
+    ].join('\n');
+
+    const cfg = await (await fetch('./config.json')).json();
+    const params = new URLSearchParams({
+      title: 'Sighting: ',
+      labels: `${cfg.labels.sighting},${cfg.labels.bird}`,
+      body
+    });
+    const url = `https://github.com/${cfg.repo_owner}/${cfg.repo_name}/issues/new?${params.toString()}`;
+    window.open(url, '_blank'); // opens the GitHub create-issue screen
+  });
+})();
+</script>
+</body>
+</html>
