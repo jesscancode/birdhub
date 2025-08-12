@@ -52,10 +52,15 @@ window.BirdHub = window.BirdHub || {};
     }
   }
 
+// inside assets/js/ui.js
 function renderSightingCard(rec, sp) {
   const thumb = rec.images && rec.images[0] ? rec.images[0] : (sp && sp.default_image) || '';
-  const sci = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
-  const img = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
+  const sci   = sp && sp.scientific_name ? `<div class="small"><em>${sp.scientific_name}</em></div>` : '';
+  const orderLine = (sp && sp.order && (sp.order.common || sp.order.scientific))
+    ? `<div class="small">Order: ${sp.order.common ? `${sp.order.common} ` : ''}${sp.order.scientific ? `<em>(${sp.order.scientific})</em>` : ''}</div>`
+    : '';
+
+  const img   = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
   const first = rec.first_ever ? '<span class="badge">First ever</span>' : '';
   const conf  = rec.confidence ? `<span class="badge">${rec.confidence}</span>` : '';
   const pet   = rec.pet_name ? `<div class="pet-name" style="opacity:.85"><em>${rec.pet_name}</em></div>` : '';
@@ -66,6 +71,7 @@ function renderSightingCard(rec, sp) {
       <h3>${rec.common_name || 'Unknown'}</h3>
       ${pet}
       ${sci}
+      ${orderLine}
       <div class="small">${formatDateTime(rec.observed_at)}</div>
       <div style="margin:6px 0">${first} ${conf}</div>
       <a class="small" href="${rec.url}" target="_blank" rel="noopener">View entry</a>

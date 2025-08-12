@@ -26,15 +26,21 @@
       lastQ = q;
 
       try {
-        const url = `https://api.inaturalist.org/v1/taxa/autocomplete?q=${encodeURIComponent(q)}&per_page=10`;
+        const url = `https://api.inaturalist.org/v1/taxa/autocomplete` +
+                      `?q=${encodeURIComponent(q)}` +
+                      `&per_page=10` +
+                      `&iconic_taxa=Aves` +          // ✅ only birds
+                      `&ranks=species,subspecies` +  // ✅ species-level names
+                      `&is_active=true`;             // ✅ ignore inactive taxa
+
         const res = await fetch(url);
         if (!res.ok) throw new Error("iNaturalist request failed");
         const data = await res.json();
         items = (data.results || []).map(t => ({
-          taxon_id:  t.id,
-          common:    t.preferred_common_name || t.name || "",
-          scientific:t.name || "",
-          thumb:     t.default_photo ? t.default_photo.square_url : null
+          taxon_id: t.id,
+          common:   t.preferred_common_name || t.name || '',
+          scientific: t.name || '',
+          thumb:    t.default_photo ? t.default_photo.square_url : null // ✅ smaller image
         }));
         render();
       } catch (e) {
@@ -62,8 +68,9 @@
     function choose(i) {
       const it = items[i]; if (!it) return;
       input.value   = it.common;
-      hidTaxon.value = String(it.taxon_id || "");
-      hidSci.value   = it.scientific || "";
+      hidTaxon.value = String(it.taxon_id);
+      hidSci.value   = it.scientific;
+      document.getElementById('default_image').value = it.thumb || '';
       hide();
     }
 

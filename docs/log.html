@@ -27,6 +27,7 @@
           <!-- store selection extras if a suggestion is chosen -->
           <input type="hidden" id="taxon_id" />
           <input type="hidden" id="scientific_name" />
+          <input type="hidden" id="default_image" />
         </label>
 
         <label>Pet name
@@ -157,6 +158,7 @@
         '','### Longitude (if Field)','', ` ${$('lon')}`,
         '','### Precision (exact/~100m/~1km)','', ` ${$('precision')}`,
         '','### Notes','', ` ${$('notes')}`,
+        '','### Default image','', ` ${$('default_image')}`,
         '','_Attach photos/videos below in the GitHub editor._'
       ].join('\n');
 
