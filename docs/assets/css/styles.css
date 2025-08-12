@@ -1,5 +1,5 @@
 
-:root{--bg:#0b1b2b;--card:#0f253a;--text:#ecf2f8;--muted:#b8c5d0;--accent:#7bd389}
+:root{--bg:#0867ff;--card:#0f253a;--text:#ecf2f8;--muted:#b8c5d0;--accent:#7bd389}
 *{box-sizing:border-box}html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif}
 a{color:var(--accent);text-decoration:none}
 header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #11344f;position:sticky;top:0;background:rgba(11,27,43,.85);backdrop-filter:saturate(180%) blur(8px)}
