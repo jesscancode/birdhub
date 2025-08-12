@@ -7,50 +7,74 @@ window.BirdHub = window.BirdHub || {};
 
   function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
 
-  async function initHome(){
-    const CFG = await g().loadConfig();
-    // Prefill body blocks matching the Issue template
-    const bodyText = [
-      '### Common name\n',
-      '### Pet Name\n',
-      '### Date & time\n',
-      '### Count\n',
-      '### Sex\n',
-      '### Age\n',
-      '### Behaviour\n',
-      '### Habitat\n',
-      '### Call type\n',
-      '### Confidence\n',
-      '### First time ever seen?\n',
-      '### Location mode (Home or Field)\n',
-      '### Place label (if Home)\n' + (CFG.home_place_label || '') + '\n',
-      '### Latitude (if Field)\n',
-      '### Longitude (if Field)\n',
-      '### Precision (exact/~100m/~1km)\n',
-      '### Notes\n',
-      '\n_Attach photos/videos below in the GitHub editor._\n'
-    ].join('\n');
-    // const params = {
-    //   title: 'Sighting: ',
-    //   labels: `${CFG.labels.sighting},${CFG.labels.bird}`,
-    //   body: bodyText
-    // };
+  // async function initHome(){
+  //   const CFG = await g().loadConfig();
+  //   // Prefill body blocks matching the Issue template
+  //   const bodyText = [
+  //     '### Common name\n',
+  //     '### Pet Name\n',
+  //     '### Date & time\n',
+  //     '### Count\n',
+  //     '### Sex\n',
+  //     '### Age\n',
+  //     '### Behaviour\n',
+  //     '### Habitat\n',
+  //     '### Call type\n',
+  //     '### Confidence\n',
+  //     '### First time ever seen?\n',
+  //     '### Location mode (Home or Field)\n',
+  //     '### Place label (if Home)\n' + (CFG.home_place_label || '') + '\n',
+  //     '### Latitude (if Field)\n',
+  //     '### Longitude (if Field)\n',
+  //     '### Precision (exact/~100m/~1km)\n',
+  //     '### Notes\n',
+  //     '\n_Attach photos/videos below in the GitHub editor._\n'
+  //   ].join('\n');
+  //   // const params = {
+  //   //   title: 'Sighting: ',
+  //   //   labels: `${CFG.labels.sighting},${CFG.labels.bird}`,
+  //   //   body: bodyText
+  //   // };
     
-    // Recent sightings
-    try{
-      const issues = await g().getIssues();
-      const recent = document.getElementById('recent');
-      const top = issues.slice(0, 6);
-      for (const it of top) {
-        const rec = p().parseIssue(it);
-        let sp = null;
-        try { sp = await s().enrichSpecies(rec.common_name); } catch (_) { sp = null; }
-        recent.appendChild(renderSightingCard(rec, sp));
-      }
-    } catch(e){
-      console.warn(e);
+  //   // Recent sightings
+  //   try{
+  //     const issues = await g().getIssues();
+  //     const recent = document.getElementById('recent');
+  //     const top = issues.slice(0, 6);
+  //     for (const it of top) {
+  //       const rec = p().parseIssue(it);
+  //       let sp = null;
+  //       try { sp = await s().enrichSpecies(rec.common_name); } catch (_) { sp = null; }
+  //       recent.appendChild(renderSightingCard(rec, sp));
+  //     }
+  //   } catch(e){
+  //     console.warn(e);
+  //   }
+  // }
+
+
+async function initHome(){
+  await g().loadConfig(); // ensure config is loaded for GitHub calls
+
+  try{
+    const issues = await g().getIssues();
+    const recent = document.getElementById('recent');
+    const top = issues.slice(0, 6);
+
+    for (const it of top){
+      const rec = p().parseIssue(it);
+
+      // 👇 don't let a single iNat failure kill the whole loop
+      let sp = null;
+      try { sp = await s().enrichSpecies(rec.common_name); }
+      catch (e) { console.warn('enrichSpecies failed (home):', e); }
+
+      recent.appendChild(renderSightingCard(rec, sp));
     }
+  }catch(e){
+    console.warn('initHome failed:', e);
   }
+}
 
 // --- in docs/assets/js/ui.js ---
 // Replace your current renderSightingCard with this:
@@ -130,18 +154,38 @@ return el(`
 
 
 
+  // async function initSightings(){
+  //   try{
+  //     const issues = await g().getIssues();
+  //     const list = document.getElementById('list');
+  //     for (const it of issues) {
+  //       const rec = p().parseIssue(it);
+  //       let sp = null;
+  //       try { sp = await s().enrichSpecies(rec.common_name); } catch (_) { sp = null; }
+  //       list.appendChild(renderSightingCard(rec, sp));
+  //     }
+  //   }catch(e){ console.warn(e); }
+  // }
+
   async function initSightings(){
-    try{
-      const issues = await g().getIssues();
-      const list = document.getElementById('list');
-      for (const it of issues) {
-        const rec = p().parseIssue(it);
-        let sp = null;
-        try { sp = await s().enrichSpecies(rec.common_name); } catch (_) { sp = null; }
-        list.appendChild(renderSightingCard(rec, sp));
-      }
-    }catch(e){ console.warn(e); }
+  try{
+    const issues = await g().getIssues();
+    const list = document.getElementById('list');
+
+    for (const it of issues){
+      const rec = p().parseIssue(it);
+
+      // 👇 same per-item guard here
+      let sp = null;
+      try { sp = await s().enrichSpecies(rec.common_name); }
+      catch (e) { console.warn('enrichSpecies failed (sightings):', e); }
+
+      list.appendChild(renderSightingCard(rec, sp));
+    }
+  }catch(e){
+    console.warn('initSightings failed:', e);
   }
+}
 
   async function initSpecies(){
     try{
