@@ -1,8 +1,8 @@
 {
   "site_title": "BirdHub",
   "tagline": "My personal bird log",
-  "repo_owner": "your-username",
-  "repo_name": "birdhub",
+"repo_owner": "jesscancode",
+"repo_name": "birdhub",
   "labels": {
     "sighting": "sighting",
     "bird": "bird"
