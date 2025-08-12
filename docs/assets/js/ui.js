@@ -52,44 +52,86 @@ window.BirdHub = window.BirdHub || {};
     }
   }
 
+// --- in docs/assets/js/ui.js ---
+// Replace your current renderSightingCard with this:
 function renderSightingCard(rec, sp) {
-  const esc = (s)=> String(s || '').replace(/[&<>"']/g, m => (
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])
-  ));
+  // Image: use your photo -> iNat default -> site icon
+  const fallbackIcon = './assets/images/logo.png';
+  const thumb = (rec.images && rec.images[0]) || (sp && sp.default_image) || fallbackIcon;
 
-  const thumb = rec.images && rec.images[0] ? rec.images[0] : (sp && sp.default_image) || '';
-  const img   = thumb ? `<img class="thumb" src="${thumb}" alt="">` : '<div class="thumb">No image</div>';
+  // Names
+  const commonName = rec.common_name || (sp && sp.preferred_common_name) || 'Unknown';
+  const scientificName = (sp && sp.scientific_name) ? sp.scientific_name : '';
 
-  const sci   = sp && sp.scientific_name ? `<div class="small"><em>${esc(sp.scientific_name)}</em></div>` : '';
+  // Order & family
+  const orderCommon  = sp && sp.order  ? sp.order.common  : '';
+  const orderSci     = sp && sp.order  ? sp.order.scientific : '';
+  const familyCommon = sp && sp.family ? sp.family.common : '';
+  const familySci    = sp && sp.family ? sp.family.scientific : '';
 
-  // Order line (common + scientific)
-  const orderLine = (sp && sp.order && (sp.order.common || sp.order.scientific))
-    ? `<div class="small">${sp.order.common ? `${esc(sp.order.common)} ` : ''}${sp.order.scientific ? `<em>(${esc(sp.order.scientific)})</em>` : ''}</div>`
+  // Conservation status
+  const status = (sp && sp.status) ? sp.status : { code: 'LC', label: 'Least Concern' };
+
+  // Confidence + first-ever + pet name
+  const confidence = rec.confidence || '';
+  const firstEver  = rec.first_ever ? '<span class="badge first-ever">First ever</span>' : '';
+  const petName    = rec.pet_name ? `<span class="badge pet-name">${rec.pet_name}</span>` : '';
+
+  // Behaviour chips
+  const behaviours = (rec.behaviour || '')
+    .split(',')
+    .map(x => x.trim())
+    .filter(Boolean)
+    .map(b => `<span class="chip mini">${b}</span>`)
+    .join(' ');
+
+  // iNat “More Info” link (if we have it)
+  const moreInfo = (sp && sp.url)
+    ? `<a class="btn-outline more-info" href="${sp.url}" target="_blank" rel="noopener">More info</a>`
     : '';
 
-  const confidence = rec.confidence ? esc(rec.confidence) : '';
-  const petName    = rec.pet_name ? esc(rec.pet_name) : '';
+  // Date / time
+  const when = formatDateTime(rec.observed_at);
 
+  // Card HTML
   return el(`
     <div class="card sighting-card">
-      ${img}
-
+      <img class="thumb small" src="${thumb}" alt="">
+      
       <div class="card-header">
-        <h3 class="common-name">${esc(rec.common_name || 'Unknown')}</h3>
+        <h3 class="common-name">
+          <a href="${rec.url}" target="_blank" rel="noopener">${commonName}</a>
+        </h3>
         ${confidence ? `<span class="badge confidence">${confidence}</span>` : ''}
       </div>
 
-      ${sci}
-      ${orderLine}
-      <div class="small">${formatDateTime(rec.observed_at)}</div>
+      ${scientificName ? `<em class="sci-name">${scientificName}</em>` : ''}
+
+      ${(orderCommon || orderSci) ? `
+        <div class="order-info">${orderCommon ? `${orderCommon} ` : ''}${orderSci ? `<em>(${orderSci})</em>` : ''}</div>
+      ` : ''}
+
+      ${(familyCommon || familySci) ? `
+        <div class="family-info">${familyCommon ? `${familyCommon} ` : ''}${familySci ? `<em>(${familySci})</em>` : ''}</div>
+      ` : ''}
+
+      <div class="status-row">
+        <span class="badge status status-${status.code.toLowerCase()}">${status.label}</span>
+        ${firstEver}
+      </div>
+
+      <div class="small when">${when}</div>
+
+      ${behaviours ? `<div class="behaviours">${behaviours}</div>` : ''}
 
       <div class="card-footer">
-        <a class="btn-outline" href="${rec.url}" target="_blank" rel="noopener">View GitHub Entry</a>
-        ${petName ? `<span class="badge pet-name">${petName}</span>` : ''}
+        ${moreInfo}
+        ${petName}
       </div>
     </div>
   `);
 }
+
 
 
 

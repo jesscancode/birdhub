@@ -1,89 +1,76 @@
 // docs/assets/js/species.js
 window.BirdHub = window.BirdHub || {};
-(function () {
-  const CACHE_PREFIX = 'bh_taxon_';
-  const cacheKey = (name) => `${CACHE_PREFIX}${(name || '').toLowerCase()}`;
+(function(){
+  const cacheKey = (name) => `bh_taxon_${name.toLowerCase()}`;
 
-  // pick a small-ish image url
-  function pickImage(photo) {
-    if (!photo) return null;
-    return photo.small_url || photo.square_url || photo.medium_url || photo.url || null;
-  }
+  // Map iNat / IUCN-ish strings to a compact status code + nice label
+  function normalizeStatus(taxon){
+    const s = (taxon && taxon.conservation_status) || null;
+    if (!s) return { code: "LC", label: "Least Concern" };
 
-  function extractOrder(ancestors) {
-    if (!Array.isArray(ancestors)) return null;
-    // iNat uses rank === "order" for bird orders
-    const ord = ancestors.find(a => a.rank === 'order');
-    if (!ord) return null;
-    return {
-      scientific: ord.name || '',
-      common: ord.preferred_common_name || ord.english_common_name || ''
-    };
+    // Try iucn code first, else the status_name
+    const raw = String(s.iucn || s.status || s.status_name || "").toLowerCase();
+
+    if (/cr|critically/.test(raw)) return { code: "CR", label: "Critically Endangered" };
+    if (/en|endangered/.test(raw)) return { code: "EN", label: "Endangered" };
+    if (/vu|vulnerable/.test(raw)) return { code: "VU", label: "Vulnerable" };
+    if (/nt|near/.test(raw))      return { code: "NT", label: "Near Threatened" };
+    if (/dd|deficient/.test(raw)) return { code: "DD", label: "Data Deficient" };
+    if (/ex|extinct/.test(raw))   return { code: "EX", label: "Extinct" };
+    return { code: "LC", label: "Least Concern" };
   }
 
   async function enrichSpecies(commonName) {
     try {
       if (!commonName) return null;
-
-      // Try cache first, but upgrade if it doesn't have 'order'
       const key = cacheKey(commonName);
       const cached = localStorage.getItem(key);
-      if (cached) {
-        try {
-          const obj = JSON.parse(cached);
-          if (obj && obj.order) return obj; // already upgraded & complete
-          // else fall through to refetch and overwrite
-        } catch {}
-      }
+      if (cached) { try { return JSON.parse(cached); } catch {} }
 
-      // 1) Find best matching bird via autocomplete (fast)
-      const url1 =
-        `https://api.inaturalist.org/v1/taxa/autocomplete` +
+      // First: find the best matching taxon (only birds)
+      const acUrl = `https://api.inaturalist.org/v1/taxa/autocomplete` +
         `?q=${encodeURIComponent(commonName)}` +
-        `&per_page=1` +
-        `&iconic_taxa=Aves` +          // only birds
-        `&is_active=true`;             // ignore inactive taxa
+        `&per_page=1&iconic_taxa=Aves&is_active=true`;
+      const acRes = await fetch(acUrl);
+      if (!acRes.ok) return null;
+      const ac = await acRes.json();
+      const hit = ac.results && ac.results[0];
+      if (!hit) return null;
 
-      const r1 = await fetch(url1);
-      if (!r1.ok) return null;
-      const j1 = await r1.json();
-      const pick = (j1.results || [])[0];
-      if (!pick) return null;
+      // Second: pull full details for order/family/status
+      const taxUrl = `https://api.inaturalist.org/v1/taxa/${hit.id}`;
+      const taxRes = await fetch(taxUrl);
+      if (!taxRes.ok) return null;
+      const taxData = await taxRes.json();
+      const taxon = taxData.results && taxData.results[0];
+      if (!taxon) return null;
 
-      // 2) Fetch full taxon (NO fields filter, so we get full ancestors)
-      const url2 = `https://api.inaturalist.org/v1/taxa/${pick.id}`;
-      const r2 = await fetch(url2);
-      if (!r2.ok) return null;
-      const j2 = await r2.json();
-      const full = (j2.results || [])[0];
-      if (!full) return null;
-
-      const order = extractOrder(full.ancestors || []);
-      const photo = full.default_photo || pick.default_photo || null;
+      const anc = Array.isArray(taxon.ancestors) ? taxon.ancestors : [];
+      const order  = anc.find(a => a.rank === 'order')  || {};
+      const family = anc.find(a => a.rank === 'family') || {};
+      const status = normalizeStatus(taxon);
 
       const info = {
-        taxon_id: full.id,
-        scientific_name: full.name,
-        preferred_common_name: full.preferred_common_name || commonName,
-        rank: full.rank,
-        default_image: pickImage(photo),
-        ancestry: (full.ancestors || []).map(a => ({
-          rank: a.rank,
-          name: a.name,
-          common: a.preferred_common_name || a.english_common_name || ''
-        })),
-        order // { scientific, common } or null
+        taxon_id: taxon.id,
+        url: `https://www.inaturalist.org/taxa/${taxon.id}`,
+        scientific_name: taxon.name,
+        preferred_common_name: taxon.preferred_common_name || commonName,
+        rank: taxon.rank,
+        default_image: (taxon.default_photo && taxon.default_photo.square_url) || (hit.default_photo && hit.default_photo.square_url) || null,
+        order:  { scientific: order.name || '',  common: order.preferred_common_name || '' },
+        family: { scientific: family.name || '', common: family.preferred_common_name || '' },
+        status  // { code, label }
       };
 
       localStorage.setItem(key, JSON.stringify(info));
       return info;
     } catch (e) {
       console.warn('enrichSpecies failed:', e);
-      return null; // never throw
+      return null;
     }
   }
 
-  async function selectSexImage() {
+  async function selectSexImage(taxonId, sex) {
     return { selected: null, male: null, female: null, default: null };
   }
 
