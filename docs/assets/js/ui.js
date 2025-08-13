@@ -79,80 +79,91 @@ async function initHome(){
   }
 }
 
-// --- in docs/assets/js/ui.js ---
-// Replace your current renderSightingCard with this:
+function rarityPoints(obsCount){
+  // fewer observations -> higher points (0..10)
+  if (obsCount <= 50) return 10;
+  if (obsCount <= 200) return 9;
+  if (obsCount <= 500) return 8;
+  if (obsCount <= 1000) return 7;
+  if (obsCount <= 5000) return 6;
+  if (obsCount <= 10000) return 5;
+  if (obsCount <= 50000) return 4;
+  if (obsCount <= 100000) return 3;
+  if (obsCount <= 500000) return 2;
+  return 1;
+}
+
+function habitatIcons(hab){
+  const h = (hab||'').toLowerCase();
+  const icons = [];
+  if (/forest|wood/.test(h)) icons.push('🌲');
+  if (/grass|savanna/.test(h)) icons.push('🌾');
+  if (/wetland|marsh|reed|swamp|river|lake/.test(h)) icons.push('🪿'); // waterfowl-ish
+  if (/coast|sea|ocean|shore|beach/.test(h)) icons.push('🌊');
+  if (/urban|garden|park|city/.test(h)) icons.push('🏙️');
+  if (/shrub|fynbos/.test(h)) icons.push('🌿');
+  return icons.map(x=>`<span class="ico" title="${hab}">${x}</span>`).join('');
+}
+
 function renderSightingCard(rec, sp) {
-  // Image: use your photo -> iNat default -> site icon
-  const fallbackIcon = './assets/images/logo.png';
-  const thumb = (rec.images && rec.images[0]) || (sp && sp.default_image) || fallbackIcon;
+  const thumb = rec.images?.[0] || sp?.default_image_medium || './assets/images/logo.png';
+  const name  = rec.common_name || 'Unknown bird';
+  const sci   = sp?.scientific_name || '';
+  const orderCommon = sp?.order?.common || '';
+  const orderSci    = sp?.order?.scientific || '';
+  const famCommon   = sp?.family?.common || '';
+  const famSci      = sp?.family?.scientific || '';
+  const status      = sp?.status ? { code: sp.status.code, label: sp.status.label } : { code:'', label:'' };
+  const points      = rarityPoints(sp?.observations_count || 0);
+  const when        = formatDateTime(rec.observed_at);
+  const conf        = rec.confidence || '';
+  const first       = rec.first_ever ? `<span class="badge first-ever">First ever</span>` : '';
+  const pet         = rec.pet_name ? `<span class="badge pet-name">${rec.pet_name}</span>` : '';
+  const moreInfo    = sp?.taxon_id ? `https://www.inaturalist.org/taxa/${sp.taxon_id}` : '#';
 
-  // Names
-  const commonName = rec.common_name || (sp && sp.preferred_common_name) || 'Unknown';
-  const scientificName = (sp && sp.scientific_name) ? sp.scientific_name : '';
-
-  // Order & family
-  const orderCommon  = sp && sp.order  ? sp.order.common  : '';
-  const orderSci     = sp && sp.order  ? sp.order.scientific : '';
-  const familyCommon = sp && sp.family ? sp.family.common : '';
-  const familySci    = sp && sp.family ? sp.family.scientific : '';
-
-  // Conservation status
-  const status = (sp && sp.status) ? sp.status : { code: 'LC', label: 'Least Concern' };
-
-  // Confidence + first-ever + pet name
-  const confidence = rec.confidence || '';
-  const firstEver  = rec.first_ever ? '<span class="badge first-ever">First ever</span>' : '';
-  const petName    = rec.pet_name ? `<span class="badge pet-name">${rec.pet_name}</span>` : '';
-
-  // Behaviour chips
   const behaviours = (rec.behaviour || '')
     .split(',')
-    .map(x => x.trim())
+    .map(x=>x.trim())
     .filter(Boolean)
     .map(b => `<span class="chip mini">${b}</span>`)
-    .join(' ');
+    .join('');
 
-  // iNat “More Info” link (if we have it)
-  const moreInfo = (sp && sp.url)
-    ? `<a class="btn-outline more-info" href="${sp.url}" target="_blank" rel="noopener">More info</a>`
-    : '';
+  return el(`
+    <div class="card wingspan">
+      <div class="wg-head">
+        <h3 class="wg-name"><a href="${rec.url}" target="_blank" rel="noopener">${name}</a></h3>
+        ${conf ? `<span class="badge confidence wg-conf">${conf}</span>` : ''}
+      </div>
 
-  // Date / time
-  const when = formatDateTime(rec.observed_at);
+      <img class="wg-img" src="${thumb}" alt="">
 
-  // Card HTML
-return el(`
-  <div class="card sighting-card">
-    <img class="thumb small" src="${thumb}" alt="">
-    
-    <div class="card-header">
-      <h3 class="common-name">
-        <a href="${rec.url}" target="_blank" rel="noopener">${commonName}</a>
-      </h3>
-      ${confidence ? `<span class="badge confidence">${confidence}</span>` : ''}
+      <div class="wg-meta">
+        ${sci ? `<div class="wg-sci"><em>${sci}</em></div>` : ''}
+        ${(orderCommon||orderSci) ? `<div class="wg-line">${orderCommon} ${orderSci?`<em>(${orderSci})</em>`:''}</div>` : ''}
+        ${(famCommon||famSci) ? `<div class="wg-line">${famCommon} ${famSci?`<em>(${famSci})</em>`:''}</div>` : ''}
+      </div>
+
+      <div class="wg-icons">
+        ${habitatIcons(rec.habitat)}
+      </div>
+
+      <div class="wg-stats">
+        <div class="wg-points" title="Rarity score">${points}</div>
+        ${status.code ? `<span class="badge status status-${status.code.toLowerCase()}" title="Conservation status">${status.label}</span>` : ''}
+        ${first}
+      </div>
+
+      <div class="wg-when">${when}</div>
+
+      ${behaviours ? `<div class="wg-beh">${behaviours}</div>` : ''}
+
+      <div class="wg-foot">
+        <a class="wg-more" href="${moreInfo}" target="_blank" rel="noopener">More info</a>
+        ${pet}
+      </div>
     </div>
-
-    ${scientificName ? `<em class="sci-name">${scientificName}</em>` : ''}
-
-    ${(orderCommon || orderSci) ? `
-      <div class="order-info">${orderCommon ? `${orderCommon} ` : ''}${orderSci ? `<em>(${orderSci})</em>` : ''}</div>
-    ` : ''}
-
-    <div class="status-row">
-      <span class="badge status status-${status.code.toLowerCase()}">${status.label}</span>
-      ${firstEver}
-      ${behaviours ? behaviours : ''}
-    </div>
-
-    <div class="small when">${when}</div>
-
-    <div class="card-footer">
-      ${moreInfo}
-      ${petName}
-    </div>
-  </div>
-`);
-    }
+  `);
+}
 
 
 
