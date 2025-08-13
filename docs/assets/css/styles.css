@@ -163,18 +163,38 @@ label {
   vertical-align: middle;
 }
 
-/* Target images inside cards in the sightings list */
-#list.grid .card img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 250px; /* prevent overly tall images */
-  object-fit: cover; /* fill while maintaining aspect ratio */
-  object-position: center; /* centre crop */
-  border-top-left-radius: 0.75rem;
-  border-top-right-radius: 0.75rem;
-  background-color: #000; /* fallback for transparent images */
+#list.grid .card img:not(.wg-img) {
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:250px;
+  object-fit:cover;
+  object-position:center;
+  border-top-left-radius:0.75rem;
+  border-top-right-radius:0.75rem;
+  background:#000;
 }
+
+.card.wingspan { padding: 0; }
+
+.wg-head {
+  display: grid;
+  grid-template-columns: 1fr auto; /* title | chip */
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 0;
+}
+.wg-conf { margin: 0; justify-self: end; }
+
+.wg-img {
+  width: 100%;
+  height: 180px;               /* fixed card visual rhythm */
+  object-fit: cover;
+  background: #061624;
+  margin: 10px 12px 0;
+  border-radius: 10px;
+}
+
 
 /* Optional: slightly larger max-height on small screens */
 @media (max-width: 600px) {

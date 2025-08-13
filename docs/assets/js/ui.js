@@ -128,14 +128,13 @@ function renderSightingCard(rec, sp) {
     .map(b => `<span class="chip mini">${b}</span>`)
     .join('');
 
-  return el(`
-    <div class="card wingspan">
-      <div class="wg-head">
-        <h3 class="wg-name"><a href="${rec.url}" target="_blank" rel="noopener">${name}</a></h3>
-        ${conf ? `<span class="badge confidence wg-conf">${conf}</span>` : ''}
-      </div>
-
-      <img class="wg-img" src="${thumb}" alt="">
+return el(`
+  <div class="card wingspan">
+    <div class="wg-head">
+      <h3 class="wg-name"><a href="${rec.url}" ...>${name}</a></h3>
+      ${conf ? `<span class="badge confidence wg-conf">${conf}</span>` : ''}
+    </div>
+    <img class="wg-img" src="${thumb}" alt="">
 
       <div class="wg-meta">
         ${sci ? `<div class="wg-sci"><em>${sci}</em></div>` : ''}
