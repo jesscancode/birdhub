@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Test - BirdHub</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0b1b2b;
+            color: white;
+            padding: 20px;
+            font-size: 16px;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #224861;
+            border-radius: 8px;
+        }
+        
+        .font-test {
+            font-size: 24px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 2px solid #ff6b6b;
+            border-radius: 4px;
+        }
+        
+        .cardenio-bold {
+            font-family: 'cardenio_modernbold', 'Georgia', 'Times New Roman', serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .thirsty-script {
+            font-family: 'thirsty_script_extrabold_deRg', 'Brush Script MT', 'Lucida Handwriting', cursive;
+            font-style: italic;
+            font-weight: 100;
+            letter-spacing: 0.5px;
+        }
+        
+        .fallback {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .fallback-script {
+            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive;
+            font-style: italic;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .success { background: #123a2c; border: 1px solid #1f6c51; }
+        .error { background: #3a1b1b; border: 1px solid #6c1f1f; }
+        .warning { background: #3a2b1b; border: 1px solid #6c4f1f; }
+    </style>
+    
+    <!-- Load our custom fonts -->
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body>
+    <h1>BirdHub Font Loading Test</h1>
+    
+    <div class="test-section">
+        <h2>Font Loading Status</h2>
+        <div id="font-status">Checking fonts...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Custom Font Tests</h2>
+        
+        <h3>Cardenio Modern Bold (Bird Names)</h3>
+        <div class="font-test cardenio-bold">
+            CAPE F - This should be in Cardenio Modern Bold
+        </div>
+        
+        <h3>Thirsty Script (Scientific Names)</h3>
+        <div class="font-test thirsty-script">
+            Pycnono - This should be in Thirsty Script
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Fallback Font Tests</h2>
+        
+        <h3>Georgia Bold (Fallback for Bird Names)</h3>
+        <div class="font-test fallback">
+            CAPE F - This should be in Georgia Bold
+        </div>
+        
+        <h3>Brush Script (Fallback for Scientific Names)</h3>
+        <div class="font-test fallback-script">
+            Pycnono - This should be in Brush Script
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Font File Accessibility</h2>
+        <div id="file-status">Checking font files...</div>
+    </div>
+    
+    <script>
+        // Check font loading
+        document.fonts.ready.then(() => {
+            console.log('Fonts loaded:', document.fonts.size);
+            
+            const customFonts = [
+                'cardenio_modernbold', 
+                'cardenio_modernregular',
+                'thirsty_script_extrabold_deRg'
+            ];
+            
+            let statusHtml = '';
+            customFonts.forEach(font => {
+                if (document.fonts.check(`12px "${font}"`)) {
+                    statusHtml += `<div class="status success">✅ ${font} is available</div>`;
+                } else {
+                    statusHtml += `<div class="status error">❌ ${font} is NOT available</div>`;
+                }
+            });
+            
+            document.getElementById('font-status').innerHTML = statusHtml;
+        });
+        
+        // Check font file accessibility
+        async function checkFontFiles() {
+            const fontFiles = [
+                './assets/fonts/cardeniomodern-bold-webfont.woff2',
+                './assets/fonts/cardeniomodern-regular-webfont.woff2',
+                './assets/fonts/thirstyscriptextrabolddemo-webfont.woff2'
+            ];
+            
+            let fileHtml = '';
+            for (const fontFile of fontFiles) {
+                try {
+                    const response = await fetch(fontFile, { method: 'HEAD' });
+                    if (response.ok) {
+                        fileHtml += `<div class="status success">✅ ${fontFile} is accessible</div>`;
+                    } else {
+                        fileHtml += `<div class="status error">❌ ${fontFile} returned ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    fileHtml += `<div class="status error">❌ ${fontFile} failed: ${error.message}</div>`;
+                }
+            }
+            
+            document.getElementById('file-status').innerHTML = fileHtml;
+        }
+        
+        checkFontFiles();
+    </script>
+</body>
+</html>

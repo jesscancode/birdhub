@@ -17,6 +17,12 @@
         <a class="btn outline" href="./sightings.html">View sightings</a>
       </p>
     </div>
+    
+    <!-- Font loading test -->
+    <div class="font-test">
+      Font Test: This should be in Cardenio Modern Bold if fonts are loading correctly
+    </div>
+    
     <h2 style="margin-top:20px">Recent</h2>
     <div id="recent" class="grid"></div>
   </main>
@@ -28,6 +34,20 @@
   <script src="./assets/js/species.js"></script>
   <script src="./assets/js/ui.js"></script>
   <script>
+    // Font loading debug
+    document.fonts.ready.then(() => {
+      console.log('Fonts loaded:', document.fonts.size);
+      // Check if our custom fonts are available
+      const customFonts = ['cardenio_modernbold', 'thirsty_script_extrabold_deRg'];
+      customFonts.forEach(font => {
+        if (document.fonts.check(`12px "${font}"`)) {
+          console.log(`✅ ${font} is available`);
+        } else {
+          console.log(`❌ ${font} is NOT available`);
+        }
+      });
+    });
+    
     window.BirdHub.initHome();
   </script>
 </body>

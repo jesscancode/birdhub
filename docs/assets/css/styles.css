@@ -23,26 +23,46 @@
    --------------------------------------------- */
 @font-face {
   font-family: 'cardenio_modernregular';
-  src: url('../fonts/cardeniomodern-regular-webfont.woff2') format('woff2'),
+  src: url('./fonts/cardeniomodern-regular-webfont.woff2') format('woff2'),
+       url('./fonts/cardeniomodern-regular-webfont.woff') format('woff'),
+       url('../fonts/cardeniomodern-regular-webfont.woff2') format('woff2'),
        url('../fonts/cardeniomodern-regular-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'cardenio_modernbold';
-  src: url('../fonts/cardeniomodern-bold-webfont.woff2') format('woff2'),
+  src: url('./fonts/cardeniomodern-bold-webfont.woff2') format('woff2'),
+       url('./fonts/cardeniomodern-bold-webfont.woff') format('woff'),
+       url('../fonts/cardeniomodern-bold-webfont.woff2') format('woff2'),
        url('../fonts/cardeniomodern-bold-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'thirsty_script_extrabold_deRg';
-  src: url('../fonts/thirstyscriptextrabolddemo-webfont.woff2') format('woff2'),
+  src: url('./fonts/thirstyscriptextrabolddemo-webfont.woff2') format('woff2'),
+       url('./fonts/thirstyscriptextrabolddemo-webfont.woff') format('woff'),
+       url('../fonts/thirstyscriptextrabolddemo-webfont.woff2') format('woff2'),
        url('../fonts/thirstyscriptextrabolddemo-webfont.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
+}
+
+/* Font loading test - this will help debug font issues */
+.font-test {
+  font-family: 'cardenio_modernbold', serif;
+  font-size: 24px;
+  color: #ff6b6b;
+  text-align: center;
+  padding: 10px;
+  border: 2px solid #ff6b6b;
+  margin: 10px 0;
 }
 
 /* ========== BASE ==========
@@ -247,7 +267,7 @@ input,select,textarea{
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  font-family: "cardenio_modernbold", serif;
+  font-family: "cardenio_modernbold", "Georgia", "Times New Roman", serif;
 }
 
 .wg-name a{ color: white; }
@@ -259,7 +279,7 @@ input,select,textarea{
   opacity: 0.9;
   margin-top: 2px;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-  font-family: "thirsty_script_extrabold_deRg", serif;
+  font-family: "thirsty_script_extrabold_deRg", "Brush Script MT", "Lucida Handwriting", cursive;
   font-weight: 100;
   font-variant: normal;
   letter-spacing: 0.5px;
@@ -299,7 +319,7 @@ input,select,textarea{
   font-weight: bold !important;
   box-shadow: none !important;
   position: relative;
-  font-family: "cardenio_modernbold", serif;
+  font-family: "cardenio_modernbold", "Georgia", "Times New Roman", serif;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
