@@ -212,7 +212,7 @@ window.BirdHub = window.BirdHub || {};
     const moreInfoUrl = sp?.taxon_id ? `https://www.inaturalist.org/taxa/${sp.taxon_id}` : `https://www.inaturalist.org/search?q=${encodeURIComponent(commonName)}`;
     const petName = rec.pet_name ? `<span class="badge pet-name">${escapeHtml(rec.pet_name)}</span>` : "";
 
-    // Wingspan card specific data
+    // Wingspan card specific data - with safe fallbacks
     const habitat = rec.habitat || "";
     const habitatType = getHabitatType(habitat);
     const resourceCost = getResourceCost(habitat, sp);
@@ -277,47 +277,53 @@ window.BirdHub = window.BirdHub || {};
   }
 
   function getResourceCost(habitat, sp) {
-    const costs = [];
-    
-    // Get habitat emoji for the diamond
-    const habitatEmoji = getHabitatEmoji(habitat);
-    
-    // Always add water (blue diamond) as base cost - this represents the bird's basic needs
-    costs.push({ type: "fish", symbol: habitatEmoji, label: "Habitat", isDiamond: true });
-    
-    // Add habitat-specific costs based on Wingspan mechanics
-    if (habitat) {
-      const h = habitat.toLowerCase();
-      if (/forest|wood|tree/.test(h)) {
-        costs.push({ type: "forest", symbol: "🌲", label: "Forest" });
-      } else if (/grass|savanna|meadow|urban|garden|park/.test(h)) {
-        costs.push({ type: "grassland", symbol: "🌾", label: "Grassland" });
-      } else if (/wetland|marsh|reed|swamp|river|lake/.test(h)) {
-        costs.push({ type: "wetland", symbol: "🪿", label: "Wetland" });
-      } else if (/coast|sea|ocean|shore|beach|cliff/.test(h)) {
-        costs.push({ type: "fish", symbol: "🐟", label: "Coastal" });
+    try {
+      const costs = [];
+      
+      // Get habitat emoji for the diamond
+      const habitatEmoji = getHabitatEmoji(habitat);
+      
+      // Always add habitat emoji as base cost
+      costs.push({ type: "habitat", symbol: habitatEmoji, label: "Habitat", isDiamond: true });
+      
+      // Add habitat-specific costs based on Wingspan mechanics
+      if (habitat && typeof habitat === 'string') {
+        const h = habitat.toLowerCase();
+        if (/forest|wood|tree/.test(h)) {
+          costs.push({ type: "forest", symbol: "🌲", label: "Forest" });
+        } else if (/grass|savanna|meadow|urban|garden|park/.test(h)) {
+          costs.push({ type: "grassland", symbol: "🌾", label: "Grassland" });
+        } else if (/wetland|marsh|reed|swamp|river|lake/.test(h)) {
+          costs.push({ type: "wetland", symbol: "🪿", label: "Wetland" });
+        } else if (/coast|sea|ocean|shore|beach|cliff/.test(h)) {
+          costs.push({ type: "fish", symbol: "🐟", label: "Coastal" });
+        }
       }
-    }
-    
-    // Add rarity-based costs (rarer birds cost more)
-    const obsCount = sp?.observations_count ?? sp?.obs_count ?? 0;
-    if (obsCount <= 500) {
-      costs.push({ type: "forest", symbol: "🌲", label: "Rare" });
-    } else if (obsCount <= 2000) {
-      costs.push({ type: "grassland", symbol: "🌾", label: "Uncommon" });
-    }
-    
-    // Add diet-based costs
-    if (sp?.diet) {
-      const diet = sp.diet.toLowerCase();
-      if (diet.includes("insectivore")) {
-        costs.push({ type: "wetland", symbol: "🪿", label: "Insect" });
-      } else if (diet.includes("piscivore")) {
-        costs.push({ type: "fish", symbol: "🐟", label: "Fish" });
+      
+      // Add rarity-based costs (rarer birds cost more)
+      const obsCount = sp?.observations_count ?? sp?.obs_count ?? 0;
+      if (obsCount <= 500) {
+        costs.push({ type: "forest", symbol: "🌲", label: "Rare" });
+      } else if (obsCount <= 2000) {
+        costs.push({ type: "grassland", symbol: "🌾", label: "Uncommon" });
       }
+      
+      // Add diet-based costs (only if diet data exists)
+      if (sp?.diet && typeof sp.diet === 'string') {
+        const diet = sp.diet.toLowerCase();
+        if (diet.includes("insectivore")) {
+          costs.push({ type: "wetland", symbol: "🪿", label: "Insect" });
+        } else if (diet.includes("piscivore")) {
+          costs.push({ type: "fish", symbol: "🐟", label: "Fish" });
+        }
+      }
+      
+      return costs;
+    } catch (error) {
+      console.warn('getResourceCost error:', error);
+      // Return basic fallback
+      return [{ type: "habitat", symbol: "🌿", label: "Habitat", isDiamond: true }];
     }
-    
-    return costs;
   }
 
   function getHabitatEmoji(habitat) {
@@ -335,128 +341,138 @@ window.BirdHub = window.BirdHub || {};
   }
 
   function getGameEffect(rec, sp) {
-    const effects = [];
-    
-    // Special effects based on sighting data
-    if (rec.first_ever) {
-      effects.push("When played: Draw 2 new bonus cards and keep 1");
-    } else if (rec.behaviour) {
-      const b = rec.behaviour.toLowerCase();
-      if (/sing|song|call/.test(b)) {
-        effects.push("When activated: All players gain 1 🎵 from the supply");
-      } else if (/nest|breed/.test(b)) {
-        effects.push("When activated: Lay 1 egg on this bird");
-      } else if (/hunt|forage/.test(b)) {
-        effects.push("When activated: Gain 1 🐛 from the supply");
-      } else if (/fish|dive/.test(b)) {
-        effects.push("When activated: Gain 1 🐟 from the supply");
+    try {
+      const effects = [];
+      
+      // Special effects based on sighting data
+      if (rec.first_ever) {
+        effects.push("When played: Draw 2 new bonus cards and keep 1");
+      } else if (rec.behaviour && typeof rec.behaviour === 'string') {
+        const b = rec.behaviour.toLowerCase();
+        if (/sing|song|call/.test(b)) {
+          effects.push("When activated: All players gain 1 🎵 from the supply");
+        } else if (/nest|breed/.test(b)) {
+          effects.push("When activated: Lay 1 egg on this bird");
+        } else if (/hunt|forage/.test(b)) {
+          effects.push("When activated: Gain 1 🐛 from the supply");
+        } else if (/fish|dive/.test(b)) {
+          effects.push("When activated: Gain 1 🐟 from the supply");
+        }
       }
-    }
-    
-    // Effects based on diet
-    if (sp?.diet) {
-      const diet = sp.diet.toLowerCase();
-      if (diet.includes("insectivore")) {
-        effects.push("When played: Gain 1 🐛 from the supply");
-      } else if (diet.includes("piscivore")) {
-        effects.push("When played: Gain 1 🐟 from the supply");
-      } else if (diet.includes("granivore")) {
-        effects.push("When played: Gain 1 🌾 from the supply");
-      } else if (diet.includes("nectar")) {
-        effects.push("When played: Gain 1 🌸 from the supply");
+      
+      // Effects based on diet (only if diet data exists)
+      if (sp?.diet && typeof sp.diet === 'string') {
+        const diet = sp.diet.toLowerCase();
+        if (diet.includes("insectivore")) {
+          effects.push("When played: Gain 1 🐛 from the supply");
+        } else if (diet.includes("piscivore")) {
+          effects.push("When played: Gain 1 🐟 from the supply");
+        } else if (diet.includes("granivore")) {
+          effects.push("When played: Gain 1 🌾 from the supply");
+        } else if (diet.includes("nectar")) {
+          effects.push("When played: Gain 1 🌸 from the supply");
+        }
       }
-    }
-    
-    // Effects based on habitat
-    if (rec.habitat) {
-      const h = rec.habitat.toLowerCase();
-      if (/forest|wood|tree/.test(h)) {
-        effects.push("When played: Gain 1 🌲 from the supply");
-      } else if (/wetland|marsh|reed|swamp|river|lake/.test(h)) {
-        effects.push("When played: Gain 1 🪿 from the supply");
-      } else if (/coast|sea|ocean|shore|beach|cliff/.test(h)) {
-        effects.push("When played: Gain 1 🐟 from the supply");
-      } else if (/grass|savanna|meadow/.test(h)) {
-        effects.push("When played: Gain 1 🌾 from the supply");
+      
+      // Effects based on habitat (only if habitat data exists)
+      if (rec.habitat && typeof rec.habitat === 'string') {
+        const h = rec.habitat.toLowerCase();
+        if (/forest|wood|tree/.test(h)) {
+          effects.push("When played: Gain 1 🌲 from the supply");
+        } else if (/wetland|marsh|reed|swamp|river|lake/.test(h)) {
+          effects.push("When played: Gain 1 🪿 from the supply");
+        } else if (/coast|sea|ocean|shore|beach|cliff/.test(h)) {
+          effects.push("When played: Gain 1 🐟 from the supply");
+        } else if (/grass|savanna|meadow/.test(h)) {
+          effects.push("When played: Gain 1 🌾 from the supply");
+        }
       }
-    }
-    
-    // Effects based on migration
-    if (sp?.migration) {
-      const migration = sp.migration.toLowerCase();
-      if (migration.includes("migratory")) {
-        effects.push("When activated: Move this bird to another habitat");
-      } else if (migration.includes("resident")) {
-        effects.push("When activated: This bird stays in place");
+      
+      // Effects based on migration (only if migration data exists)
+      if (sp?.migration && typeof sp.migration === 'string') {
+        const migration = sp.migration.toLowerCase();
+        if (migration.includes("migratory")) {
+          effects.push("When activated: Move this bird to another habitat");
+        } else if (migration.includes("resident")) {
+          effects.push("When activated: This bird stays in place");
+        }
       }
-    }
-    
-    // Default effect based on rarity
-    if (!effects.length) {
-      const obsCount = sp?.observations_count ?? sp?.obs_count ?? 0;
-      if (obsCount <= 1000) {
-        effects.push("When played: Gain 1 🌲 from the supply");
-      } else {
-        effects.push("When played: Gain 1 🐟 from the supply");
+      
+      // Default effect based on rarity
+      if (!effects.length) {
+        const obsCount = sp?.observations_count ?? sp?.obs_count ?? 0;
+        if (obsCount <= 1000) {
+          effects.push("When played: Gain 1 🌲 from the supply");
+        } else {
+          effects.push("When played: Gain 1 🐟 from the supply");
+        }
       }
+      
+      return effects[0];
+    } catch (error) {
+      console.warn('getGameEffect error:', error);
+      return "When played: Gain 1 🐟 from the supply"; // Default fallback
     }
-    
-    return effects[0];
   }
 
   function getFact(rec, sp) {
-    const facts = [];
-    
-    // Conservation status facts
-    if (sp?.status) {
-      const status = getStatus(sp);
-      if (status?.code === "en" || status?.code === "cr") {
-        facts.push("This species is threatened by habitat loss and climate change");
-      } else if (status?.code === "vu" || status?.code === "nt") {
-        facts.push("This species faces conservation challenges in some regions");
+    try {
+      const facts = [];
+      
+      // Conservation status facts
+      if (sp?.status) {
+        const status = getStatus(sp);
+        if (status?.code === "en" || status?.code === "cr") {
+          facts.push("This species is threatened by habitat loss and climate change");
+        } else if (status?.code === "vu" || status?.code === "nt") {
+          facts.push("This species faces conservation challenges in some regions");
+        }
       }
+      
+      // Diet-based facts (only if diet data exists)
+      if (sp?.diet && typeof sp.diet === 'string') {
+        const diet = sp.diet.toLowerCase();
+        if (diet.includes("insectivore")) facts.push("This bird helps control insect populations");
+        if (diet.includes("piscivore")) facts.push("This bird is an excellent fisher");
+        if (diet.includes("nectar")) facts.push("This bird is an important pollinator");
+      }
+      
+      // Migration facts (only if migration data exists)
+      if (sp?.migration && typeof sp.migration === 'string') {
+        const migration = sp.migration.toLowerCase();
+        if (migration.includes("migratory")) facts.push("This bird travels long distances seasonally");
+        if (migration.includes("resident")) facts.push("This bird stays in the same area year-round");
+      }
+      
+      // Habitat-specific facts (only if habitat data exists)
+      if (rec.habitat && typeof rec.habitat === 'string') {
+        const h = rec.habitat.toLowerCase();
+        if (/forest|wood/.test(h)) facts.push("Forest birds are excellent at finding insects in tree bark");
+        if (/wetland|marsh|reed|swamp|river|lake/.test(h)) facts.push("Wetland birds have specialized bills for catching aquatic prey");
+        if (/coast|sea|ocean|shore|beach/.test(h)) facts.push("Coastal birds are adapted to saltwater environments");
+        if (/grass|savanna/.test(h)) facts.push("Grassland birds are adapted to open hunting grounds");
+      }
+      
+      // Behavior facts (only if behavior data exists)
+      if (rec.behaviour && typeof rec.behaviour === 'string') {
+        const b = rec.behaviour.toLowerCase();
+        if (/sing|song|call/.test(b)) facts.push("This bird's vocalizations help establish territory");
+        if (/nest|breed/.test(b)) facts.push("Nesting behavior varies by habitat and food availability");
+        if (/hunt|forage/.test(b)) facts.push("This bird uses specialized hunting techniques");
+      }
+      
+      // Size-based facts (only if size data exists)
+      if (sp?.size && typeof sp.size === 'string') {
+        const size = sp.size.toLowerCase();
+        if (size === "small") facts.push("Small birds are agile and can access tight spaces");
+        if (size === "large") facts.push("Large birds are powerful hunters and flyers");
+      }
+      
+      return facts[0] || "Birds play crucial roles in ecosystem health and biodiversity";
+    } catch (error) {
+      console.warn('getFact error:', error);
+      return "Birds play crucial roles in ecosystem health and biodiversity"; // Default fallback
     }
-    
-    // Diet-based facts
-    if (sp?.diet) {
-      const diet = sp.diet.toLowerCase();
-      if (diet.includes("insectivore")) facts.push("This bird helps control insect populations");
-      if (diet.includes("piscivore")) facts.push("This bird is an excellent fisher");
-      if (diet.includes("nectar")) facts.push("This bird is an important pollinator");
-    }
-    
-    // Migration facts
-    if (sp?.migration) {
-      const migration = sp.migration.toLowerCase();
-      if (migration.includes("migratory")) facts.push("This bird travels long distances seasonally");
-      if (migration.includes("resident")) facts.push("This bird stays in the same area year-round");
-    }
-    
-    // Habitat-specific facts
-    if (rec.habitat) {
-      const h = rec.habitat.toLowerCase();
-      if (/forest|wood/.test(h)) facts.push("Forest birds are excellent at finding insects in tree bark");
-      if (/wetland|marsh|reed|swamp|river|lake/.test(h)) facts.push("Wetland birds have specialized bills for catching aquatic prey");
-      if (/coast|sea|ocean|shore|beach/.test(h)) facts.push("Coastal birds are adapted to saltwater environments");
-      if (/grass|savanna/.test(h)) facts.push("Grassland birds are adapted to open hunting grounds");
-    }
-    
-    // Behavior facts
-    if (rec.behaviour) {
-      const b = rec.behaviour.toLowerCase();
-      if (/sing|song|call/.test(b)) facts.push("This bird's vocalizations help establish territory");
-      if (/nest|breed/.test(b)) facts.push("Nesting behavior varies by habitat and food availability");
-      if (/hunt|forage/.test(b)) facts.push("This bird uses specialized hunting techniques");
-    }
-    
-    // Size-based facts
-    if (sp?.size) {
-      const size = sp.size.toLowerCase();
-      if (size === "small") facts.push("Small birds are agile and can access tight spaces");
-      if (size === "large") facts.push("Large birds are powerful hunters and flyers");
-    }
-    
-    return facts[0] || "Birds play crucial roles in ecosystem health and biodiversity";
   }
 
   function getSize(sp) {

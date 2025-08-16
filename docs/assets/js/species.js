@@ -8,10 +8,34 @@ window.BirdHub = window.BirdHub || {};
     // iNat may expose either `conservation_status` (object) or `statuses[]`
     const s = t.conservation_status || (Array.isArray(t.statuses) && t.statuses[0]) || null;
     if (!s) return null;
-    // Common codes we’ll color: LC/NT/VU/EN/CR/EX/DD
-    const code = (s.status || s.status_name || '').toUpperCase();
-    const label = s.iucn ? s.iucn.toUpperCase() : (s.status_name || s.status || '').replace(/_/g, ' ');
-    return { code, label: label || code };
+    
+    // Safely handle different status field structures
+    let code = '';
+    let label = '';
+    
+    // Try to get the status code
+    if (s.status && typeof s.status === 'string') {
+      code = s.status.toUpperCase();
+    } else if (s.status_name && typeof s.status_name === 'string') {
+      code = s.status_name.toUpperCase();
+    } else if (s.iucn && typeof s.iucn === 'string') {
+      code = s.iucn.toUpperCase();
+    }
+    
+    // Try to get the label
+    if (s.iucn && typeof s.iucn === 'string') {
+      label = s.iucn.toUpperCase();
+    } else if (s.status_name && typeof s.status_name === 'string') {
+      label = s.status_name.replace(/_/g, ' ');
+    } else if (s.status && typeof s.status === 'string') {
+      label = s.status.replace(/_/g, ' ');
+    }
+    
+    // Fallback if we couldn't get either
+    if (!code && label) code = label;
+    if (!label && code) label = code;
+    
+    return code ? { code, label } : null;
   }
 
   async function enrichSpecies(commonName) {
