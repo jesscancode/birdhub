@@ -1,356 +1,446 @@
-:root {
-  --bg: #0b1b2b;
-  --card: #0f253a;
-  --text: #ecf2f8;
-  --muted: #b8c5d0;
-  --accent: #0867ff;
+/* ========== THEME ==========
+   --------------------------------------------- */
+:root{
+  --bg:#0b1b2b;
+  --surface:#0f253a;
+  --text:#ecf2f8;
+  --muted:#d0bbb8;
+  --accent:#0867ff;
+
+  /* chips / badges */
+  --chip-bg:#0b2033;
+  --chip-bd:#224861;
+  --badge-green:#123a2c;
+  --badge-green-bd:#1f6c51;
+
+  /* wingspan-like */
+  --ws-paper:#f0f7e6;
+  --ws-ink:#3d2342;
+  --ws-accent:#3aa6b9;
 }
 
-* {
-  box-sizing: border-box;
+/* ========== CUSTOM FONTS ==========
+   --------------------------------------------- */
+@font-face {
+  font-family: 'cardenio_modernregular';
+  src: url('../fonts/cardeniomodern-regular-webfont.woff2') format('woff2'),
+       url('../fonts/cardeniomodern-regular-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, sans-serif;
+@font-face {
+  font-family: 'cardenio_modernbold';
+  src: url('../fonts/cardeniomodern-bold-webfont.woff2') format('woff2'),
+       url('../fonts/cardeniomodern-bold-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
-a {
-  color: var(--accent);
-  text-decoration: none;
+@font-face {
+  font-family: 'thirsty_script_extrabold_deRg';
+  src: url('../fonts/thirstyscriptextrabolddemo-webfont.woff2') format('woff2'),
+       url('../fonts/thirstyscriptextrabolddemo-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid #11344f;
-  position: sticky;
-  top: 0;
-  background: rgba(11, 27, 43, 0.85);
-  backdrop-filter: saturate(180%) blur(8px);
+/* ========== BASE ==========
+   --------------------------------------------- */
+*{box-sizing:border-box}
+html,body{
+  margin:0; padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+}
+a{ color:var(--accent); text-decoration:none }
+.small{ font-size:.9rem; color:var(--muted) }
+
+/* ========== APP CHROME ==========
+   --------------------------------------------- */
+header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:16px 20px; border-bottom:1px solid #11344f;
+  position:sticky; top:0;
+  background:rgba(11,27,43,.85); backdrop-filter:saturate(180%) blur(8px);
+}
+.brand{ display:flex; align-items:center; gap:10px }
+.logo-img{ height:70px; width:auto; display:inline-block; vertical-align:middle }
+nav a{ margin-left:14px; font-weight:500; color:var(--muted) }
+
+.container{ max-width:980px; margin:0 auto; padding:20px }
+
+.card{
+  background:var(--surface);
+  border:1px solid rgba(8,103,255,.35);
+  border-radius:14px;
+  padding:16px;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
 }
 
-.brand .logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #7bd389, #4fb391);
-  display: inline-block;
+footer{ padding:40px 20px; color:var(--muted); text-align:center }
+
+/* ========== BUTTONS / BADGES / CHIPS ==========
+   --------------------------------------------- */
+.btn{
+  display:inline-block; padding:10px 14px; border-radius:10px;
+  background:var(--accent); color:#0a1a2a; font-weight:700;
+}
+.btn.outline{
+  background:transparent; border:1px solid var(--accent); color:var(--accent);
 }
 
-.brand .title {
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  border: #c3ff01;
+.badge{
+  display:inline-block; padding:2px 8px; border-radius:999px;
+  font-size:.75rem; margin-right:6px;
 }
+.badge.confidence{ background:var(--badge-green); color:#b2f5d6; border:1px solid var(--badge-green-bd) }
+.badge.first-ever{ background:#41205a; color:#f2e6ff; border:1px solid #6d37a1 }
+.badge.pet-name{ background:#c3ff01; color:#0b1b2b; border:1px solid #9cdd00; font-weight:700 }
 
-nav a {
-  margin-left: 14px;
-  font-weight: 500;
-  color: var(--muted);
-}
+/* IUCN-ish conservation status */
+.badge.status{ color:#0b1b2b; border:1px solid transparent }
+.status-lc{ background:#7ee081 }   /* Least Concern */
+.status-nt{ background:#f1d76a }   /* Near Threatened */
+.status-vu{ background:#f4a259 }   /* Vulnerable */
+.status-en{ background:#ff6b6b }   /* Endangered */
+.status-cr{ background:#d7263d; color:#fff } /* Critically Endangered */
+.status-ex{ background:#555; color:#fff }    /* Extinct */
+.status-dd{ background:#cfcfcf; color:#0b1b2b } /* Data Deficient */
 
-.container {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.card {
-  background: var(--card);
-  border: 1px solid #0867ff;
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.btn {
-  display: inline-block;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: var(--accent);
-  color: #0a1a2a;
-  font-weight: 700;
-}
-
-.btn.outline {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-}
-
-.kicker {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-footer {
-  padding: 40px 20px;
-  color: var(--muted);
-  text-align: center;
-}
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #123a2c;
-  color: #b2f5d6;
-  border: 1px solid #1f6c51;
-  font-size: 0.75rem;
-  margin-right: 6px;
-}
-
-.small {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #224861;
-  background: #0b2033;
-  color: var(--text);
-}
-
-label {
-  display: block;
-  margin: 8px 0 6px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-@media (max-width: 700px) {
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-.sighting-card h3 {
-  margin: 6px 0 8px;
-}
-
-.logo-img {
-  height: 70px;
-  width: auto;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-#list.grid .card img:not(.wg-img) {
-  display:block;
-  width:100%;
-  height:auto;
-  max-height:250px;
-  object-fit:cover;
-  object-position:center;
-  border-top-left-radius:0.75rem;
-  border-top-right-radius:0.75rem;
-  background:#000;
-}
-
-.card.wingspan { padding: 0; }
-
-.wg-head {
-  display: grid;
-  grid-template-columns: 1fr auto; /* title | chip */
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px 0;
-}
-.wg-conf { margin: 0; justify-self: end; }
-
-.wg-img {
-  width: 100%;
-  height: 180px;               /* fixed card visual rhythm */
-  object-fit: cover;
-  background: #061624;
-  margin: 10px 12px 0;
-  border-radius: 10px;
-}
-
-
-/* Optional: slightly larger max-height on small screens */
-@media (max-width: 600px) {
-  #list.grid .card img {
-    max-height: 200px;
-  }
-}
-
-
-.suggestions{
-  position:absolute; left:0; right:0; top:100%; z-index:20;
-  background:#0e2636; border:1px solid #224861; border-radius:10px;
-  margin-top:6px; max-height:260px; overflow:auto;
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-}
-.suggestions .row{
-  display:flex; align-items:center; gap:10px;
-  padding:8px 10px; cursor:pointer;
-}
-.suggestions .row:hover, .suggestions .row.active{
-  background:#0867ff;
-}
-.suggestions .thumb{
-  width:28px; height:28px; border-radius:6px; object-fit:cover; flex:0 0 28px;
-}
-.suggestions .names{
-  display:flex; flex-direction:column; line-height:1.1;
-}
-.suggestions .common{ font-weight:600 }
-.suggestions .sci{ opacity:.75; font-style:italic; font-size:.92em }
-
-
-
-
-/* Layout rows */
-.card-header{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:10px; margin-top:8px;
-}
-.card-header .common-name{ margin:0; }
-.card-header .common-name a{ color:var(--text); text-decoration:none; }
-.card-header .common-name a:hover{ text-decoration:underline; }
-
-.card-footer{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:10px; margin-top:10px;
-}
-
-/* Smaller, optimized thumbnail */
-.thumb.small{
-  width:100%; height:170px; object-fit:cover; border-radius:10px;
-  background:#061624;
-}
-
-/* Mini chips for behaviour */
 .chip.mini{
   display:inline-block; padding:2px 8px; border-radius:999px;
-  border:1px solid #224861; background:#0b2033; color:#b8c5d0;
-  font-size:.78rem; margin-right:6px; margin-top:6px;
-}
-
-/* Badges */
-.badge.confidence{ background:#123a2c; color:#b2f5d6; border:1px solid #1f6c51; }
-.badge.first-ever{ background:#41205a; border:1px solid #6d37a1; color:#f2e6ff; }
-.badge.pet-name{ background:#c3ff01; color:#0b1b2b; border:1px solid #9cdd00; }
-
-/* Conservation status colors by code: LC, NT, VU, EN, CR, EX, DD */
-.badge.status{ color:#0b1b2b; border:1px solid transparent; }
-.status-lc{ background:#7ee081; }            /* green */
-.status-nt{ background:#f1d76a; }            /* yellow */
-.status-vu{ background:#f4a259; }            /* orange */
-.status-en{ background:#ff6b6b; }            /* red */
-.status-cr{ background:#d7263d; color:#fff;} /* deep red */
-.status-ex{ background:#555; color:#fff; }   /* grey/black */
-.status-dd{ background:#cfcfcf; color:#0b1b2b; } /* light grey */
-
-.order-info,.family-info{ color:var(--muted); margin-top:4px; }
-.when{ margin-top:6px; }
-.more-info.btn-outline{
-  border:1px solid var(--accent); color:var(--accent);
-  padding:8px 12px; border-radius:10px; text-decoration:none;
-}
-.more-info.btn-outline:hover{ background:rgba(8,103,255,.15); }
-
-
-.status-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px; /* equal space between badges and chips */
-  margin-top: 6px;
-  align-items: center;
-}
-.status-row .chip.mini {
-  margin: 0; /* removes the default chip margin so it matches badges */
-}
-
-
-/* === Wingspan-like card skin === */
-.card.wingspan {
-  --paper:#f7f0e6;
-  --ink:#233142;
-  --accent:#3aa6b9;
-  background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0)) , var(--card);
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(8,103,255,.35);
-}
-.wg-head {
-  display: grid;
-  grid-template-columns: auto 52px;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px 0;
-}
-.wg-name { margin: 0; font-size: 1.25rem; line-height: 1.15; }
-.wg-name a { color: var(--text); text-decoration: none; }
-.wg-name a:hover { text-decoration: underline; }
-.wg-conf { margin-left: auto; justify-self: end; }
-
-.wg-img { width: 100%; height: 180px; object-fit: cover; background:#061624; margin: 10px 12px 0; border-radius: 10px; }
-
-.wg-meta { padding: 8px 12px 0; }
-.wg-sci { font-style: italic; color: var(--muted); }
-.wg-line { color: var(--muted); margin-top: 2px; }
-
-.wg-icons { display: flex; gap: 6px; padding: 6px 12px 0; font-size: 1.05rem; }
-.wg-icons .ico { filter: drop-shadow(0 1px 0 rgba(0,0,0,.25)); }
-
-.wg-stats { display: flex; gap: 10px; align-items: center; padding: 8px 12px 0; flex-wrap: wrap; }
-.wg-points {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: #e8d4a2; color:#4b3816; font-weight: 800; 
-  display:flex; align-items:center; justify-content:center;
-  border:1px solid #c8b07a; font-variant-numeric: tabular-nums;
-}
-.badge.status{ color:#0b1b2b; border:1px solid transparent; }
-.status-lc{ background:#7ee081 }
-.status-nt{ background:#f1d76a }
-.status-vu{ background:#f4a259 }
-.status-en{ background:#ff6b6b }
-.status-cr{ background:#d7263d; color:#fff }
-.status-ex{ background:#555; color:#fff }
-.status-dd{ background:#cfcfcf; color:#0b1b2b }
-
-.badge.first-ever{ background:#41205a; color:#f2e6ff; border:1px solid #6d37a1 }
-.badge.confidence{ background:#123a2c; color:#b2f5d6; border:1px solid #1f6c51 }
-
-.wg-when { color: var(--muted); padding: 6px 12px 0; }
-.wg-beh { padding: 6px 12px 0; display:flex; gap:6px; flex-wrap:wrap; }
-.chip.mini{
-  padding: 2px 8px; border-radius: 999px; border:1px solid #224861; background:#0b2033; color:#b8c5d0;
+  border:1px solid var(--chip-bd); background:var(--chip-bg); color:var(--muted);
   font-size:.78rem;
 }
 
-.wg-foot { padding: 10px 12px 12px; display:flex; justify-content:space-between; align-items:center; }
-.wg-more {
-  border:1px solid var(--accent); color: var(--accent); border-radius:10px; padding:8px 12px; text-decoration:none;
+/* ========== FORMS ==========
+   --------------------------------------------- */
+label{ display:block; margin:8px 0 6px }
+input,select,textarea{
+  width:100%; padding:10px; border-radius:10px;
+  border:1px solid var(--chip-bd); background:#0b2033; color:var(--text);
 }
-.badge.pet-name{ background:#c3ff01; color:#0b1b2b; border:1px solid #9cdd00; font-weight:700 }
+.form-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+@media (max-width:700px){ .form-row{ grid-template-columns:1fr } }
+
+/* ========== AUTOCOMPLETE (iNat) ==========
+   --------------------------------------------- */
+.suggestions{
+  position:absolute; left:0; right:0; top:100%; z-index:20;
+  background:#0e2636; border:1px solid var(--chip-bd); border-radius:10px;
+  margin-top:6px; max-height:260px; overflow:auto; box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.suggestions .row{ display:flex; align-items:center; gap:10px; padding:8px 10px; cursor:pointer }
+.suggestions .row:hover, .suggestions .row.active{ background:#0867ff33 }
+.suggestions .thumb{ width:28px; height:28px; border-radius:6px; object-fit:cover; flex:0 0 28px }
+.suggestions .names{ display:flex; flex-direction:column; line-height:1.1 }
+.suggestions .common{ font-weight:600 }
+.suggestions .sci{ opacity:.75; font-style:italic; font-size:.92em }
+
+/* ========== WINGSPAN CARD SKIN ==========
+   --------------------------------------------- */
+/* Ensure default card padding doesn't conflict */
+.card.wingspan{ 
+  padding: 0; 
+  overflow: hidden; 
+  background: var(--ws-paper);
+  color: var(--ws-ink);
+  border: 2px solid #d4c4a3;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: relative;
+  min-height: 450px;
+  width: 100%;
+  font-family: 'Georgia', serif;
+}
+
+/* Top section: Resource cost (left) + Name banner (right) */
+.wg-top-section{
+  display: flex;
+  height: 80px;
+}
+
+/* Resource cost section (left side) */
+.wg-cost-section{
+  width: 80px;
+  background: #e8e8e8;
+  border-right: 2px solid #d0d0d0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-bottom: 2px solid #d0d0d0;
+}
+
+.wg-cost-diamond{
+  width: 24px;
+  height: 24px;
+  background: #3aa6b9;
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.wg-cost-diamond::before{
+  content: "";
+  transform: rotate(-45deg);
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.wg-cost-items{
+  display: flex;
+  gap: 2px;
+}
+
+.wg-cost-item{
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.wg-cost-fish{ background: #3aa6b9; }
+.wg-cost-forest{ background: #2d5016; }
+.wg-cost-grassland{ background: #8fbc8f; }
+.wg-cost-wetland{ background: #4682b4; }
+.wg-cost-desert{ background: #daa520; }
+
+/* Name banner (right side) */
+.wg-name-banner{
+  flex: 1;
+  background: #8b8b8b;
+  color: white;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-bottom: 2px solid #6b6b6b;
+}
+
+.wg-name{ 
+  margin: 0; 
+  font-size: 1.1rem; 
+  line-height: 1.1;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  font-family: "cardenio_modernbold", serif;
+}
+
+.wg-name a{ color: white; }
+.wg-name a:hover{ text-decoration: underline; }
+
+.wg-sci-banner{
+  font-style: italic;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-top: 2px;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+  font-family: "thirsty_script_extrabold_deRg", serif;
+  font-weight: 100;
+  font-variant: normal;
+  letter-spacing: 0.5px;
+}
+
+/* Left side stats column */
+.wg-left-stats{
+  position: absolute;
+  left: 8px;
+  top: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.wg-stat-item{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #8b8b8b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid #6b6b6b;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.wg-points{
+  background: transparent !important;
+  color: #3d2342 !important;
+  border: none !important;
+  font-size: 21px !important;
+  font-weight: bold !important;
+  box-shadow: none !important;
+  position: relative;
+  font-family: "cardenio_modernbold", serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wg-feather-icon{
+  position: absolute;
+  right: -18px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-5deg);
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+}
+
+.wg-nest-type{
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.wg-egg-count{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  gap: 1px;
+}
+
+.wg-egg-icon{
+  width: 12px;
+  height: 12px;
+  opacity: 0.9;
+}
+
+/* Main image area */
+.wg-img-container{
+  margin: 8px 8px 8px 48px;
+  position: relative;
+}
+
+.wg-img{
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  background: #f5f5f5;
+  border: 2px solid #d0d0d0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Size indicator below image */
+.wg-size{
+  text-align: center;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--ws-ink);
+}
+
+.wg-size::before,
+.wg-size::after{
+  content: "🦅";
+  margin: 0 8px;
+  font-size: 1.2rem;
+}
+
+/* Habitat type indicator */
+.wg-habitat{
+  text-align: center;
+  margin: 8px 0;
+  padding: 4px 8px;
+  background: #2d5016;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 48px;
+  margin-right: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.wg-habitat::before{
+  content: "🌿 ";
+}
+
+/* Game effect text */
+.wg-effect{
+  background: #ff6b35;
+  color: white;
+  padding: 8px 12px;
+  margin: 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-align: center;
+  margin-left: 48px;
+  margin-right: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Fact text at bottom */
+.wg-fact{
+  background: #8b8b8b;
+  color: white;
+  padding: 8px 12px;
+  margin: 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  text-align: center;
+  margin-left: 48px;
+  margin-right: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.wg-fact::before{
+  content: "🌍 ";
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px){
+  .card.wingspan{ min-height: 400px; }
+  .wg-left-stats{ top: 80px; }
+  .wg-img-container{ margin-left: 44px; }
+  .wg-habitat{ margin-left: 44px; }
+  .wg-effect{ margin-left: 44px; }
+  .wg-fact{ margin-left: 44px; }
+}
+
+/* ========== MISC IMAGES IN GRID (non-wingspan) ==========
+   --------------------------------------------- */
+/* Only affect plain images in cards, never the Wingspan image */
+#list.grid .card img:not(.wg-img){
+  display:block; width:100%; height:auto; max-height:250px;
+  object-fit:cover; object-position:center;
+  border-top-left-radius:.75rem; border-top-right-radius:.75rem;
+  background:#000;
+}
+@media (max-width:600px){
+  #list.grid .card img:not(.wg-img){ max-height:200px }
+}

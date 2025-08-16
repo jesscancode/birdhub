@@ -1,0 +1,180 @@
+<!-- demo.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <title>BirdHub · Wingspan Cards Demo</title>
+  <script src="./assets/js/template-loader.js" defer></script>
+  <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="container">
+    <div class="card">
+      <h1>Wingspan Cards Demo</h1>
+      <p class="small">This page demonstrates the new Wingspan-style bird sighting cards. The cards now mirror the design of the Wingspan board game with proper resource costs, stats, and game effects.</p>
+    </div>
+    
+    <h2 style="margin-top:20px">Sample Wingspan Cards</h2>
+    <div id="demo-cards" class="grid"></div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="./assets/js/github.js"></script>
+  <script src="./assets/js/parser.js"></script>
+  <script src="./assets/js/species.js"></script>
+  <script src="./assets/js/ui.js"></script>
+  <script>
+    // Demo function to show sample Wingspan cards
+    function showDemoCards() {
+      const container = document.getElementById('demo-cards');
+      if (!container) return;
+
+      // Sample data for demo cards
+      const demoData = [
+        {
+          common_name: "Atlantic Puffin",
+          habitat: "coastal cliffs",
+          behaviour: "nesting, fishing, diving",
+          first_ever: true,
+          url: "#",
+          images: ["./assets/images/logo.png"],
+          observed_at: "2024-01-15T10:30:00Z"
+        },
+        {
+          common_name: "Roseate Spoonbill",
+          habitat: "wetland marsh",
+          behaviour: "foraging, wading",
+          first_ever: false,
+          url: "#",
+          images: ["./assets/images/logo.png"],
+          observed_at: "2024-01-14T14:20:00Z"
+        },
+        {
+          common_name: "Osprey",
+          habitat: "forest near lake",
+          behaviour: "hunting, diving, fishing",
+          first_ever: false,
+          url: "#",
+          images: ["./assets/images/logo.png"],
+          observed_at: "2024-01-13T09:15:00Z"
+        },
+        {
+          common_name: "Cape Bulbul",
+          habitat: "urban garden",
+          behaviour: "singing, foraging",
+          first_ever: false,
+          url: "#",
+          images: ["./assets/images/logo.png"],
+          observed_at: "2024-01-12T08:45:00Z"
+        },
+        {
+          common_name: "Desert Lark",
+          habitat: "arid desert",
+          behaviour: "foraging, ground nesting",
+          first_ever: false,
+          url: "#",
+          images: ["./assets/images/logo.png"],
+          observed_at: "2024-01-11T12:00:00Z"
+        },
+        {
+          common_name: "Alpine Chough",
+          habitat: "mountain alpine",
+          behaviour: "soaring, cliff nesting",
+          first_ever: false,
+          url: "#",
+          images: ["./assets/images/logo.png"],
+          observed_at: "2024-01-10T15:30:00Z"
+        }
+      ];
+
+      // Mock species data
+      const mockSpecies = {
+        "Atlantic Puffin": {
+          scientific_name: "Fratercula arctica",
+          observations_count: 45,
+          status: { code: "vu", label: "Vulnerable" },
+          family: { scientific: "Alcidae" },
+          order: { scientific: "Charadriiformes" },
+          size: "Medium",
+          nest_type: "Burrow",
+          egg_count: "1",
+          diet: "Piscivore",
+          migration: "Partial Migrant"
+        },
+        "Roseate Spoonbill": {
+          scientific_name: "Platalea ajaja",
+          observations_count: 1250,
+          status: { code: "lc", label: "Least Concern" },
+          family: { scientific: "Threskiornithidae" },
+          order: { scientific: "Pelecaniformes" },
+          size: "Large",
+          nest_type: "Platform",
+          egg_count: "2-4",
+          diet: "Omnivore",
+          migration: "Resident"
+        },
+        "Osprey": {
+          scientific_name: "Pandion haliaetus",
+          observations_count: 8500,
+          status: { code: "lc", label: "Least Concern" },
+          family: { scientific: "Pandionidae" },
+          order: { scientific: "Accipitriformes" },
+          size: "Large",
+          nest_type: "Platform",
+          egg_count: "2-4",
+          diet: "Piscivore",
+          migration: "Migratory"
+        },
+        "Cape Bulbul": {
+          scientific_name: "Pycnonotus capensis",
+          observations_count: 3200,
+          status: { code: "lc", label: "Least Concern" },
+          family: { scientific: "Pycnonotidae" },
+          order: { scientific: "Passeriformes" },
+          size: "Small",
+          nest_type: "Cup",
+          egg_count: "2-3",
+          diet: "Omnivore",
+          migration: "Resident"
+        },
+        "Desert Lark": {
+          scientific_name: "Ammomanes deserti",
+          observations_count: 850,
+          status: { code: "lc", label: "Least Concern" },
+          family: { scientific: "Alaudidae" },
+          order: { scientific: "Passeriformes" },
+          size: "Small",
+          nest_type: "Ground",
+          egg_count: "2-4",
+          diet: "Insectivore",
+          migration: "Resident"
+        },
+        "Alpine Chough": {
+          scientific_name: "Pyrrhocorax graculus",
+          observations_count: 1200,
+          status: { code: "lc", label: "Least Concern" },
+          family: { scientific: "Corvidae" },
+          order: { scientific: "Passeriformes" },
+          size: "Medium",
+          nest_type: "Cavity",
+          egg_count: "3-5",
+          diet: "Omnivore",
+          migration: "Partial Migrant"
+        }
+      };
+
+      // Render demo cards
+      demoData.forEach(rec => {
+        const sp = mockSpecies[rec.common_name];
+        const card = window.BirdHub.renderWingspanCard(rec, sp);
+        container.appendChild(card);
+      });
+    }
+
+    // Initialize demo when page loads
+    document.addEventListener('DOMContentLoaded', showDemoCards);
+  </script>
+</body>
+</html>
